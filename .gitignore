@@ -1,2 +1,3 @@
 ryu/db.sqlite3
 ryu/tags
+*.pyc
