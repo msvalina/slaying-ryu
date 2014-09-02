@@ -1,3 +1,5 @@
 ryu/db.sqlite3
 ryu/tags
+ryu/keys.txt
+ryu/tasks.dat
 *.pyc
