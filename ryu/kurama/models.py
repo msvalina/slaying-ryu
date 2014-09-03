@@ -5,6 +5,8 @@ class TasksList(models.Model):
     title = models.CharField(max_length=50)
     updated = models.DateTimeField('last modification time')
     selfLink = models.URLField('tasks list url')
+    def __unicode__(self):
+        return "TasksList: " + self.title
 
 class Task(models.Model):
     tasksList = models.ForeignKey(TasksList)
@@ -24,4 +26,6 @@ class Task(models.Model):
     linkDescp = models.CharField(max_length=200)
     linkUrl = models.URLField()
     linkType = models.CharField(max_length=20)
+    def __unicode__(self):
+        return "Task: " self.title + " TasksList: " + self.tasksList
 
