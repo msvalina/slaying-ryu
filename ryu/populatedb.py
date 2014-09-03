@@ -19,7 +19,7 @@ class Auth():
 
     def __init__(self):
         if (os.path.isfile("tasks.dat")):
-            self.auth()
+            self.get_service()
         else:
             try:
                 with open("keys.txt", "r") as self.f:
@@ -31,7 +31,7 @@ class Auth():
                 self.client_secret = raw_input("Enter your client secret: ")
                 self.apikey = raw_input("Enter your api key: ")
                 self.write_auth()
-            self.auth()
+            self.get_service()
 
     def write_auth(self):
         with open("keys.txt", "w") as self.fw:
@@ -39,7 +39,7 @@ class Auth():
             self.fw.write(str(self.client_secret) + "\n")
             self.fw.write(str(self.apikey) + "\n")
 
-    def auth(self):
+    def get_service(self):
         FLAGS = gflags.FLAGS
 
         # Set up a Flow object to be used if we need to authenticate. This
@@ -80,8 +80,14 @@ class Auth():
 
         return service
 
-if __name__ == '__main__':
-    service = Auth().auth()
+def main():
+    service = Auth().get_service()
     tasklists = service.tasklists().list().execute()
-    print tasklists
+    usedLists = ['01-Im&Ds', '02-Im&Nds', '03-Ni&Ds', '04-Ni&Nds']
+    for tl in tasklists['items']:
+        if (tl['title'] in usedLists):
+            print tl['title']
+
+if __name__ == '__main__':
+    main()
 
