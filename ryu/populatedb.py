@@ -1,15 +1,16 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
-import gflags
-import httplib2
 import sys
 import os
-
+import gflags
+import httplib2
 from apiclient.discovery import build
 from oauth2client.file import Storage
 from oauth2client.client import OAuth2WebServerFlow
 from oauth2client.tools import run
+from datetime import date, timedelta
+from kurama.models import Task, TasksList
 
 class Auth():
 
@@ -80,14 +81,55 @@ class Auth():
 
         return service
 
+def set_env():
+    # Seting python and djagno env var 
+    ryudir = os.path.dirname(os.path.realpath(__file__))
+    sys.path.append(ryudir)
+    os.environ['DJANGO_SETTINGS_MODULE'] = 'ryu.settings'
+
 def main():
     service = Auth().get_service()
     tasklists = service.tasklists().list().execute()
+
+    # Save every tasklist that's in usedLists to database
     usedLists = ['01-Im&Ds', '02-Im&Nds', '03-Ni&Ds', '04-Ni&Nds']
     for tl in tasklists['items']:
         if (tl['title'] in usedLists):
+            print "Saving task list: "
             print tl['title']
+            listEntry = TasksList(tasksListId = tl['id'],
+                              title = tl['title'],
+                              updated = tl['updated'],
+                              selfLink = tl['selfLink'])
+            listEntry.save()
+
+            # Get complited tasks from January first 2014 until today
+            today = date.today().strftime('%Y-%m-%dT00:00:00Z')
+            tasks = service.tasks().list(tasklist=tl['id'],
+                            completedMin="2014-01-01T00:00:00Z",
+                            completedMax=today,
+                            showHidden="True").execute()
+            for t in tasks['items']:
+                print t['title']
+                taskEntry = Task(tasksList = listEntry,
+                                taskId = t['id'],
+                                # TODO tag = getProjectTag(t['title'])
+                                tag = t['title'][:3],
+                                title = t['title'],
+                                updated = t['updated'],
+                                selfLink = t['selfLink'],
+                                parent = t.get('parent', None),
+                                position = t['position'],
+                                notes = t.get('notes', None),
+                                status = t['status'],
+                                # due = t.get('due', '1970-01-01'),
+                                due = t.get('due', None),
+                                completed = t['completed'])
+                taskEntry.save()
+    # TODO  Write function that will get list of "tasks"/projects from task list
+    # "Projects list"
 
 if __name__ == '__main__':
+    set_env()
     main()
 

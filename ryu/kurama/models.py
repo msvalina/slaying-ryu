@@ -1,3 +1,4 @@
+import datetime
 from django.db import models
 
 class TasksList(models.Model):
@@ -6,26 +7,23 @@ class TasksList(models.Model):
     updated = models.DateTimeField('last modification time')
     selfLink = models.URLField('tasks list url')
     def __unicode__(self):
-        return "TasksList: " + self.title
+        out  = self.title + " updated: " + \
+                self.updated.strftime('%Y-%m-%d %H:%M:%S')
+        return out
 
 class Task(models.Model):
     tasksList = models.ForeignKey(TasksList)
     taskId = models.CharField(max_length=100, primary_key=True)
-    tag = models.CharField(max_length=20)
+    tag = models.CharField(max_length=20, null=True, blank=True)
     title = models.CharField(max_length=200)
-    updated = models.DateTimeField('updated')
+    updated = models.DateTimeField('last modification time')
     selfLink = models.URLField('task url')
-    parent = models.CharField(max_length=100)
-    positon = models.BigIntegerField()
-    notes = models.CharField(max_length=1000)
+    parent = models.CharField(max_length=100, null=True, blank=True)
+    position = models.BigIntegerField()
+    notes = models.CharField(max_length=1000, null=True, blank=True)
     status = models.CharField(max_length=15)
-    due = models.DateTimeField('task due')
+    due = models.DateTimeField('task due', null=True, blank=True)
     completed = models.DateTimeField('completed on')
-    deleted = models.BooleanField()
-    hidden = models.BooleanField()
-    linkDescp = models.CharField(max_length=200)
-    linkUrl = models.URLField()
-    linkType = models.CharField(max_length=20)
     def __unicode__(self):
-        return "Task: " self.title + " TasksList: " + self.tasksList
+        return "Task: " + self.title
 
