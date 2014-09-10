@@ -27,3 +27,14 @@ class Task(models.Model):
     def __unicode__(self):
         return "Task: " + self.title
 
+class Project(models.Model):
+    tag = models.CharField(max_length=10)
+    name = models.CharField(max_length=30)
+    position = models.BigIntegerField()
+    description = models.CharField(max_length=1000, null=True, blank=True)
+    notes = models.CharField(max_length=1000, null=True, blank=True)
+    status = models.CharField(max_length=15)
+    due = models.DateTimeField('task due', null=True, blank=True)
+    completed = models.DateTimeField('completed on', null=True, blank=True)
+    def __unicode__(self):
+        return "Project: " + self.name + " tag: " + self.tag

@@ -3,6 +3,7 @@
 
 import sys
 import os
+import string
 import gflags
 import httplib2
 from apiclient.discovery import build
@@ -10,7 +11,7 @@ from oauth2client.file import Storage
 from oauth2client.client import OAuth2WebServerFlow
 from oauth2client.tools import run
 from datetime import date, timedelta
-from kurama.models import Task, TasksList
+from kurama.models import Task, TasksList, Project
 
 class Auth():
 
@@ -88,7 +89,9 @@ def set_env():
     os.environ['DJANGO_SETTINGS_MODULE'] = 'ryu.settings'
 
 def main():
+    # Authenticate 
     service = Auth().get_service()
+    # Fetch tasklists
     tasklists = service.tasklists().list().execute()
 
     # Save every tasklist that's in usedLists to database
@@ -111,23 +114,49 @@ def main():
                             showHidden="True").execute()
             for t in tasks['items']:
                 print t['title']
+                # Get special tag "=" which is in form "=Commit last changes"
+                # Every other task is in form "$rn$ Pay your rent dude"
+                if (t['title'][0] == "="):
+                    foundTag = t['title'][0]
+                    foundTitle = t['title'][1:]
+                else:
+                    foundTag = string.split(t['title'])[0].strip()
+                    foundTitle  = string.split(t['title'], ' ', 1)[1].strip()
+                # Save fetched task in corresponding db field
                 taskEntry = Task(tasksList = listEntry,
                                 taskId = t['id'],
-                                # TODO tag = getProjectTag(t['title'])
-                                tag = t['title'][:3],
-                                title = t['title'],
+                                tag = foundTag,
+                                title = foundTitle,
                                 updated = t['updated'],
                                 selfLink = t['selfLink'],
                                 parent = t.get('parent', None),
                                 position = t['position'],
                                 notes = t.get('notes', None),
                                 status = t['status'],
-                                # due = t.get('due', '1970-01-01'),
                                 due = t.get('due', None),
                                 completed = t['completed'])
                 taskEntry.save()
     # TODO  Write function that will get list of "tasks"/projects from task list
     # "Projects list"
+    getProjectTags(service)
+
+def getProjectTags(service):
+    tasklists = service.tasklists().list().execute()
+    for tl in tasklists['items']:
+        if (tl['title'] == "Projects list"):
+            print tl['title']
+            tasks = service.tasks().list(tasklist=tl['id']).execute()
+            for t in tasks['items']:
+                projectEntry = Project(
+                    tag = string.split(t['title'],"-")[0].strip(),
+                    name = string.split(t['title'],"-")[1].strip(),
+                    position = t['position'],
+                    notes = t.get('notes', None),
+                    status = t['status'],
+                    due = t.get('due', None),
+                    completed = t.get('completed', None))
+                projectEntry.save()
+                print t['title']
 
 if __name__ == '__main__':
     set_env()
