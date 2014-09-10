@@ -13,15 +13,17 @@ from oauth2client.tools import run
 from datetime import date, timedelta
 from kurama.models import Task, TasksList, Project
 
-class Auth():
+class PopulateDB:
 
     client_id = ""
     client_secret = ""
     apikey = ""
+    service = None
 
     def __init__(self):
         if (os.path.isfile("tasks.dat")):
-            self.get_service()
+            self.getService()
+            self.setEnv()
         else:
             try:
                 with open("keys.txt", "r") as self.f:
@@ -32,16 +34,17 @@ class Auth():
                 self.client_id = raw_input("Enter your client id: ")
                 self.client_secret = raw_input("Enter your client secret: ")
                 self.apikey = raw_input("Enter your api key: ")
-                self.write_auth()
-            self.get_service()
+                self.writeAuth()
+            self.getService()
+            self.setEnv()
 
-    def write_auth(self):
+    def writeAuth(self):
         with open("keys.txt", "w") as self.fw:
             self.fw.write(str(self.client_id) + "\n")
             self.fw.write(str(self.client_secret) + "\n")
             self.fw.write(str(self.apikey) + "\n")
 
-    def get_service(self):
+    def getService(self):
         FLAGS = gflags.FLAGS
 
         # Set up a Flow object to be used if we need to authenticate. This
@@ -77,88 +80,84 @@ class Auth():
         # the Google APIs Console
         # to get a developerKey for your own application.
         # I used API key for Browser applications
-        service = build(serviceName='tasks', version='v1', http=http,
-               developerKey=self.apikey)
+        self.service = build(serviceName='tasks', version='v1', http=http,
+                             developerKey=self.apikey)
 
-        return service
+    def setEnv(self):
+        # Seting python and djagno env var
+        ryudir = os.path.dirname(os.path.realpath(__file__))
+        sys.path.append(ryudir)
+        os.environ['DJANGO_SETTINGS_MODULE'] = 'ryu.settings'
 
-def set_env():
-    # Seting python and djagno env var 
-    ryudir = os.path.dirname(os.path.realpath(__file__))
-    sys.path.append(ryudir)
-    os.environ['DJANGO_SETTINGS_MODULE'] = 'ryu.settings'
+    def getTaskLists(self):
+        tasklists = self.service.tasklists().list().execute()
+        # Save every tasklist that's in usedLists to database
+        usedLists = ['01-Im&Ds', '02-Im&Nds', '03-Ni&Ds', '04-Ni&Nds']
+        for tl in tasklists['items']:
+            if (tl['title'] in usedLists):
+                print "Saving task list: "
+                print tl['title']
+                listEntry = TasksList(tasksListId = tl['id'],
+                                      title = tl['title'],
+                                      updated = tl['updated'],
+                                      selfLink = tl['selfLink'])
+                listEntry.save()
 
-def main():
-    # Authenticate 
-    service = Auth().get_service()
-    # Fetch tasklists
-    tasklists = service.tasklists().list().execute()
-
-    # Save every tasklist that's in usedLists to database
-    usedLists = ['01-Im&Ds', '02-Im&Nds', '03-Ni&Ds', '04-Ni&Nds']
-    for tl in tasklists['items']:
-        if (tl['title'] in usedLists):
-            print "Saving task list: "
-            print tl['title']
-            listEntry = TasksList(tasksListId = tl['id'],
-                              title = tl['title'],
-                              updated = tl['updated'],
-                              selfLink = tl['selfLink'])
-            listEntry.save()
-
-            # Get complited tasks from January first 2014 until today
-            today = date.today().strftime('%Y-%m-%dT00:00:00Z')
-            tasks = service.tasks().list(tasklist=tl['id'],
+                # Get complited tasks from January first 2014 until today
+                today = date.today().strftime('%Y-%m-%dT00:00:00Z')
+                tasks = self.service.tasks().list(
+                            tasklist=tl['id'],
                             completedMin="2014-01-01T00:00:00Z",
                             completedMax=today,
                             showHidden="True").execute()
-            for t in tasks['items']:
-                print t['title']
-                # Get special tag "=" which is in form "=Commit last changes"
-                # Every other task is in form "$rn$ Pay your rent dude"
-                if (t['title'][0] == "="):
-                    foundTag = t['title'][0]
-                    foundTitle = t['title'][1:]
-                else:
-                    foundTag = string.split(t['title'])[0].strip()
-                    foundTitle  = string.split(t['title'], ' ', 1)[1].strip()
-                # Save fetched task in corresponding db field
-                taskEntry = Task(tasksList = listEntry,
-                                taskId = t['id'],
-                                tag = foundTag,
-                                title = foundTitle,
-                                updated = t['updated'],
-                                selfLink = t['selfLink'],
-                                parent = t.get('parent', None),
-                                position = t['position'],
-                                notes = t.get('notes', None),
-                                status = t['status'],
-                                due = t.get('due', None),
-                                completed = t['completed'])
-                taskEntry.save()
-    # TODO  Write function that will get list of "tasks"/projects from task list
-    # "Projects list"
-    getProjectTags(service)
 
-def getProjectTags(service):
-    tasklists = service.tasklists().list().execute()
-    for tl in tasklists['items']:
-        if (tl['title'] == "Projects list"):
-            print tl['title']
-            tasks = service.tasks().list(tasklist=tl['id']).execute()
-            for t in tasks['items']:
-                projectEntry = Project(
-                    tag = string.split(t['title'],"-")[0].strip(),
-                    name = string.split(t['title'],"-")[1].strip(),
-                    position = t['position'],
-                    notes = t.get('notes', None),
-                    status = t['status'],
-                    due = t.get('due', None),
-                    completed = t.get('completed', None))
-                projectEntry.save()
-                print t['title']
+                for t in tasks['items']:
+                    print t['title']
+                    # Get special tag "=" which is in form "=Commit last changes"
+                    # Every other task is in form "$rn$ Pay your rent dude"
+                    if (t['title'][0] == "="):
+                        foundTag = t['title'][0]
+                        foundTitle = t['title'][1:]
+                    else:
+                        foundTag = string.split(t['title'])[0].strip()
+                        foundTitle  = string.split(t['title'], ' ', 1)[1].strip()
+                    # Save fetched task in corresponding db field
+                    taskEntry = Task(tasksList = listEntry,
+                                     taskId = t['id'],
+                                     tag = foundTag,
+                                     title = foundTitle,
+                                     updated = t['updated'],
+                                     selfLink = t['selfLink'],
+                                     parent = t.get('parent', None),
+                                     position = t['position'],
+                                     notes = t.get('notes', None),
+                                     status = t['status'],
+                                     due = t.get('due', None),
+                                     completed = t['completed'])
+                    taskEntry.save()
+
+    def getProjectLists(self):
+        tasklists = self.service.tasklists().list().execute()
+        for tl in tasklists['items']:
+            if (tl['title'] == "Projects list"):
+                print tl['title']
+                tasks = self.service.tasks().list(tasklist=tl['id']).execute()
+                for t in tasks['items']:
+                    projectEntry = Project(
+                        tag = string.split(t['title'],"-")[0].strip(),
+                        name = string.split(t['title'],"-")[1].strip(),
+                        position = t['position'],
+                        notes = t.get('notes', None),
+                        status = t['status'],
+                        due = t.get('due', None),
+                        completed = t.get('completed', None))
+                    projectEntry.save()
+                    print t['title']
+
+def main():
+    populateDB = PopulateDB()
+    populateDB.getTaskLists()
+    populateDB.getProjectLists()
 
 if __name__ == '__main__':
-    set_env()
     main()
-
