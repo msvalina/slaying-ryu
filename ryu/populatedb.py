@@ -90,6 +90,7 @@ class PopulateDB:
         os.environ['DJANGO_SETTINGS_MODULE'] = 'ryu.settings'
 
     def getTaskLists(self):
+        tagList = self.getProjectLists()
         taskLists = self.service.tasklists().list().execute()
         # Save every tasklist that's in usedLists to database
         usedLists = ['01-Im&Ds', '02-Im&Nds', '03-Ni&Ds', '04-Ni&Nds']
@@ -103,7 +104,7 @@ class PopulateDB:
                                       selfLink=tl['selfLink'])
                 listEntry.save()
 
-                # Get complited tasks from January first 2014 until today
+                # Get completed tasks from January first 2014 until today
                 today = date.today().strftime('%Y-%m-%dT00:00:00Z')
                 tasks = self.service.tasks().list(
                             tasklist=tl['id'],
@@ -112,16 +113,20 @@ class PopulateDB:
                             showHidden="True").execute()
 
                 for tsk in tasks['items']:
+                    # Set default task tag to *raz* in case there is no tag in
+                    # Project List
+                    taskTag = "*raz*"
+                    taskTitle = tsk['title'].strip()
                     print tsk['title']
-                    # Get special tag "=" which is in form "=Commit last
-                    # changes" Every other task is in form "$rn$ Pay your rent
-                    # dude"
-                    if tsk['title'][0] == "=":
-                        taskTag = tsk['title'][0]
-                        taskTitle = tsk['title'][1:]
-                    else:
-                        taskTag = string.split(tsk['title'])[0].strip()
-                        taskTitle = string.split(tsk['title'], ' ', 1)[1].strip()
+
+                    # Get task tag from tagList insted of directly spliting from
+                    # task name, so now task which has tag without space before
+                    # title can be recongnized correctly
+                    for tag in tagList:
+                        if tag in tsk['title']:
+                            taskTag = tag
+                            taskTitle = string.replace(tsk['title'], tag, "")
+                            taskTitle = taskTitle.strip()
                     # Save fetched task in corresponding db field
                     taskEntry = Task(taskList=listEntry,
                                      taskId=tsk['id'],
@@ -139,26 +144,30 @@ class PopulateDB:
 
     def getProjectLists(self):
         taskLists = self.service.tasklists().list().execute()
+        tagList = []
         for tl in taskLists['items']:
             if tl['title'] == "Projects list":
                 print tl['title']
                 tasks = self.service.tasks().list(tasklist=tl['id']).execute()
                 for tsk in tasks['items']:
+                    tag = string.split(tsk['title'], "-")[0].strip()
+                    title = string.split(tsk['title'], "-")[1].strip()
                     projectEntry = Project(
-                        tag=string.split(tsk['title'], "-")[0].strip(),
-                        name=string.split(tsk['title'], "-")[1].strip(),
+                        tag=tag,
+                        name=title,
                         position=tsk['position'],
                         notes=tsk.get('notes', None),
                         status=tsk['status'],
                         due=tsk.get('due', None),
                         completed=tsk.get('completed', None))
                     projectEntry.save()
+                    tagList.append(tag)
                     print tsk['title']
+        return tagList
 
 def main():
     populateDB = PopulateDB()
     populateDB.getTaskLists()
-    populateDB.getProjectLists()
 
 if __name__ == '__main__':
     main()
