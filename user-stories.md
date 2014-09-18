@@ -16,6 +16,8 @@ Engine.
 As a user I want to see a list of completed task from last week sorted by date
 and two categories (IM and NIM)
 
-
+### User Story 04
+As an admin I want to sort Tasks by completed field on django admin change
+list page
 
 # vim: tw=78
