@@ -11,7 +11,7 @@ from oauth2client.file import Storage
 from oauth2client.client import OAuth2WebServerFlow
 from oauth2client.tools import run
 from datetime import date, timedelta
-from kurama.models import Task, TaskLists, Project
+from kurama.models import TaskList, Task, Project
 
 class PopulateDB:
 
@@ -98,7 +98,7 @@ class PopulateDB:
             if tl['title'] in usedLists:
                 print "Saving task list: "
                 print tl['title']
-                listEntry = TaskLists(taskListId=tl['id'],
+                listEntry = TaskList(taskListId=tl['id'],
                                       title=tl['title'],
                                       updated=tl['updated'],
                                       selfLink=tl['selfLink'])
