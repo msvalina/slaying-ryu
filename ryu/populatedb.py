@@ -13,7 +13,7 @@ from oauth2client.tools import run
 from datetime import date, timedelta
 from kurama.models import TaskList, Task, Project
 
-class PopulateDB:
+class PopulateDB(object):
 
     clientID = ""
     clientSecret = ""
@@ -156,7 +156,7 @@ class PopulateDB:
                         tag=tag,
                         name=title,
                         position=tsk['position'],
-                        notes=tsk.get('notes', None),
+                        description=tsk.get('notes', None),
                         status=tsk['status'],
                         due=tsk.get('due', None),
                         completed=tsk.get('completed', None))
