@@ -46,3 +46,7 @@ class Project(models.Model):
     completed = models.DateTimeField('completed on', null=True, blank=True)
     def __unicode__(self):
         return "Project: " + self.name + " tag: " + self.tag
+
+    class Meta:
+        # Sort same as postions in gtasks
+        ordering = ['position']
