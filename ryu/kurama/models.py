@@ -2,8 +2,8 @@ import datetime
 from django.db import models
 
 class TaskList(models.Model):
-    taskListId = models.CharField(max_length=100, primary_key=True)
-    title = models.CharField(max_length=50)
+    taskListId = models.CharField(max_length=100)
+    title = models.CharField(max_length=50, primary_key=True)
     updated = models.DateTimeField('last modification time')
     selfLink = models.URLField('tasks list url')
 
@@ -20,6 +20,7 @@ class Task(models.Model):
     taskList = models.ForeignKey(TaskList)
     taskId = models.CharField(max_length=100, primary_key=True)
     tag = models.CharField(max_length=20, null=True, blank=True)
+    tagName = models.CharField(max_length=40, null=True, blank=True)
     title = models.CharField(max_length=200)
     updated = models.DateTimeField('last modification time')
     selfLink = models.URLField('task url')
@@ -38,7 +39,7 @@ class Task(models.Model):
 
 class Project(models.Model):
     tag = models.CharField(max_length=10)
-    name = models.CharField(max_length=30)
+    name = models.CharField(max_length=30, primary_key=True)
     position = models.BigIntegerField()
     description = models.CharField(max_length=1000, null=True, blank=True)
     status = models.CharField(max_length=15)

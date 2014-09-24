@@ -90,7 +90,7 @@ class PopulateDB(object):
         os.environ['DJANGO_SETTINGS_MODULE'] = 'ryu.settings'
 
     def getTaskLists(self):
-        tagList = self.getProjectLists()
+        tagDict = self.getProjectLists()
         taskLists = self.service.tasklists().list().execute()
         # Save every tasklist that's in usedLists to database
         usedLists = ['01-Im&Ds', '02-Im&Nds', '03-Ni&Ds', '04-Ni&Nds']
@@ -119,18 +119,20 @@ class PopulateDB(object):
                     taskTitle = tsk['title'].strip()
                     print tsk['title']
 
-                    # Get task tag from tagList insted of directly spliting from
+                    # Get task tag from tagDict insted of directly spliting from
                     # task name, so now task which has tag without space before
                     # title can be recongnized correctly
-                    for tag in tagList:
+                    for tag in tagDict:
                         if tag in tsk['title']:
                             taskTag = tag
+                            tagName = tagDict[tag]
                             taskTitle = string.replace(tsk['title'], tag, "")
                             taskTitle = taskTitle.strip()
                     # Save fetched task in corresponding db field
                     taskEntry = Task(taskList=listEntry,
                                      taskId=tsk['id'],
                                      tag=taskTag,
+                                     tagName=tagName,
                                      title=taskTitle,
                                      updated=tsk['updated'],
                                      selfLink=tsk['selfLink'],
@@ -144,7 +146,7 @@ class PopulateDB(object):
 
     def getProjectLists(self):
         taskLists = self.service.tasklists().list().execute()
-        tagList = []
+        tagDict = {}
         for tl in taskLists['items']:
             if tl['title'] == "Projects list":
                 print tl['title']
@@ -161,9 +163,9 @@ class PopulateDB(object):
                         due=tsk.get('due', None),
                         completed=tsk.get('completed', None))
                     projectEntry.save()
-                    tagList.append(tag)
+                    tagDict[tag] = title
                     print tsk['title']
-        return tagList
+        return tagDict
 
 def main():
     populateDB = PopulateDB()
