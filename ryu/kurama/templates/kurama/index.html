@@ -1,0 +1,9 @@
+{% if latest_tasks %}
+    <ul>
+    {% for task in latest_tasks %}
+        <li><a href="/kurama/{{ task.taskList_id }}/">{{ task.title }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No tasks are available.</p>
+{% endif %}
