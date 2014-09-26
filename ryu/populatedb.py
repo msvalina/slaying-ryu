@@ -104,10 +104,10 @@ class PopulateDB(object):
             if tskl['title'] in used_lists:
                 print "Saving task list: "
                 print tskl['title']
-                listEntry = TaskList(taskListId=tskl['id'],
-                                      title=tskl['title'],
-                                      updated=tskl['updated'],
-                                      selfLink=tskl['selfLink'])
+                listEntry = TaskList(task_list_id=tskl['id'],
+                                     title=tskl['title'],
+                                     updated=tskl['updated'],
+                                     self_link=tskl['selfLink'])
                 listEntry.save()
 
                 # Get completed tasks from January first 2014 until today
@@ -135,13 +135,13 @@ class PopulateDB(object):
                             task_title = string.replace(tsk['title'], tag, "")
                             task_title = task_title.strip()
                     # Save fetched task in corresponding db field
-                    taskEntry = Task(taskList=listEntry,
-                                     taskId=tsk['id'],
+                    taskEntry = Task(task_list=listEntry,
+                                     task_id=tsk['id'],
                                      tag=task_tag,
-                                     tagName=tag_name,
+                                     tag_name=tag_name,
                                      title=task_title,
                                      updated=tsk['updated'],
-                                     selfLink=tsk['selfLink'],
+                                     self_link=tsk['selfLink'],
                                      parent=tsk.get('parent', None),
                                      position=tsk['position'],
                                      notes=tsk.get('notes', None),

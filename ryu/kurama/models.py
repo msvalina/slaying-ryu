@@ -2,10 +2,11 @@ import datetime
 from django.db import models
 
 class TaskList(models.Model):
-    taskListId = models.CharField(max_length=100)
+    """ Task List model """
+    task_list_id = models.CharField(max_length=100)
     title = models.CharField(max_length=50, primary_key=True)
     updated = models.DateTimeField('last modification time')
-    selfLink = models.URLField('tasks list url')
+    self_link = models.URLField('tasks list url')
 
     def __unicode__(self):
         return self.title
@@ -14,30 +15,40 @@ class TaskList(models.Model):
         return self.updated.strftime('%Y-%m-%d %H:%M:%S')
 
     class Meta:
+        """ Metadata for TaskList model fields """
+        # Sort ascending by title field
         ordering = ['title']
+        # When using latest() return latest by completed field
+        get_latest_by = ['-updated']
 
 class Task(models.Model):
-    taskList = models.ForeignKey(TaskList)
-    taskId = models.CharField(max_length=100, primary_key=True)
+    """ Task model """
+    task_list = models.ForeignKey(TaskList)
+    task_id = models.CharField(max_length=100, primary_key=True)
     tag = models.CharField(max_length=20, null=True, blank=True)
-    tagName = models.CharField(max_length=40, null=True, blank=True)
+    tag_name = models.CharField(max_length=40, null=True, blank=True)
     title = models.CharField(max_length=200)
     updated = models.DateTimeField('last modification time')
-    selfLink = models.URLField('task url')
+    self_link = models.URLField('task url')
     parent = models.CharField(max_length=100, null=True, blank=True)
     position = models.BigIntegerField()
     notes = models.CharField(max_length=1000, null=True, blank=True)
     status = models.CharField(max_length=15)
     due = models.DateTimeField('task due', null=True, blank=True)
     completed = models.DateTimeField('completed on')
+
     def __unicode__(self):
         return "Task: " + self.title
 
     class Meta:
-        # Sort descending "-" by completed filed
+        """ Metadata for Task model fields """
+        # Sort descending "-" by completed field
         ordering = ['-completed']
+        # When using latest() return latest by completed field
+        get_latest_by = ['-completed']
 
 class Project(models.Model):
+    """ Project model """
     tag = models.CharField(max_length=10)
     name = models.CharField(max_length=30, primary_key=True)
     position = models.BigIntegerField()
@@ -49,5 +60,6 @@ class Project(models.Model):
         return "Project: " + self.name + " tag: " + self.tag
 
     class Meta:
+        """ Metadata for Project model fields """
         # Sort same as postions in gtasks
         ordering = ['position']
