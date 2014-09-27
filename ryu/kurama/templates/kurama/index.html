@@ -1,6 +1,17 @@
-{% if latest_tasks %}
+{% if latest_im_tasks %}
+    <h2> Latest Important tasks </h2>
     <ul>
-    {% for task in latest_tasks %}
+    {% for task in latest_im_tasks %}
+        <li><a href="/kurama/{{ task.taskList_id }}/">{{ task.title }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No tasks are available.</p>
+{% endif %}
+{% if latest_ni_tasks %}
+    <h2> Latest Not Important tasks </h2>
+    <ul>
+    {% for task in latest_ni_tasks %}
         <li><a href="/kurama/{{ task.taskList_id }}/">{{ task.title }}</a></li>
     {% endfor %}
     </ul>
