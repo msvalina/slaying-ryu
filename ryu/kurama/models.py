@@ -38,14 +38,15 @@ class Task(models.Model):
     completed = models.DateTimeField('completed on')
 
     def __unicode__(self):
-        return "Task: " + self.title
+        return self.title
 
     class Meta:
         """ Metadata for Task model fields """
         # Sort descending "-" by completed field
         ordering = ['-completed']
         # When using latest() return latest by completed field
-        get_latest_by = ['-completed']
+        get_latest_by = 'completed'
+        order_with_respect_to = 'task_list'
 
 class Project(models.Model):
     """ Project model """
@@ -57,7 +58,7 @@ class Project(models.Model):
     due = models.DateTimeField('task due', null=True, blank=True)
     completed = models.DateTimeField('completed on', null=True, blank=True)
     def __unicode__(self):
-        return "Project: " + self.name + " tag: " + self.tag
+        return self.name + " tag: " + self.tag
 
     class Meta:
         """ Metadata for Project model fields """
