@@ -111,11 +111,14 @@ class PopulateDB(object):
                 listEntry.save()
 
                 # Get completed tasks from January first 2014 until today
-                today = date.today().strftime('%Y-%m-%dT00:00:00Z')
+                # actually tommorow because of otherwise it won't fetch todays
+                # completed tasks - wired I know...
+                tommorow = date.today() + timedelta(1)
+                tommorow = tommorow.strftime('%Y-%m-%dT00:00:00Z')
                 tasks = self.service.tasks().list(
                             tasklist=tskl['id'],
                             completedMin="2014-01-01T00:00:00Z",
-                            completedMax=today,
+                            completedMax=tommorow,
                             showHidden="True").execute()
 
                 for tsk in tasks['items']:
