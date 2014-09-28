@@ -1,8 +1,15 @@
+<head>
+    <meta charset="utf-8">
+    <title>Task lists page</title>
+    <script type="text/javascript" charset="utf-8">
+       <link rel="stylesheet" href="/css/master.css" type="text/css" media="screen" title="no title" charset="utf-8">
+   </script>
+</head>
 {% if latest_im_tasks %}
     <h2> Latest Important tasks </h2>
     <ul>
     {% for task in latest_im_tasks %}
-        <li><a href="/kurama/{{ task.taskList_id }}/">{{ task.title }}</a></li>
+    <li><a href="/kurama/{{ task.task_id }}/">{{ task.task_list}} - {{ task.title }}</a></li>
     {% endfor %}
     </ul>
 {% else %}
@@ -12,9 +19,28 @@
     <h2> Latest Not Important tasks </h2>
     <ul>
     {% for task in latest_ni_tasks %}
-        <li><a href="/kurama/{{ task.taskList_id }}/">{{ task.title }}</a></li>
+        <li><a href="/kurama/{{ task.task_id }}/">{{ task.task_list}} - {{ task.title }}</a></li>
     {% endfor %}
     </ul>
 {% else %}
     <p>No tasks are available.</p>
 {% endif %}
+{% if tasklists %}
+   <h2 id="tasks_lists">Tasks lists</h2>
+   {% for tl in tasklists %}
+   <ul>
+       <li> <a href="/kurama/{{ tl.title }}" target="_blank">{{ tl.title }}</a> </li>
+   </ul>
+   {% endfor %}
+{% else %}
+    <p>No task lists are available </p>
+{% endif %}
+
+<h2 id="statistcs_by:">Statistcs by:</h2>
+<ul>
+    <li><a href="last_week" target="_blank">Last week</a></li>
+    <li><a href="last_month" target="_blank">Last month</a></li>
+    <li><a href="last_quarter" target="_blank">Last quarter</a></li>
+    <li><a href="last_year" target="_blank">Last year</a></li>
+</ul>
+
