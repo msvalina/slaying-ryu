@@ -15,7 +15,7 @@ class TaskAdmin(admin.ModelAdmin):
     Changes admin options and functionality for given model
     """
     fields = ('title', 'tag', 'completed', 'notes')
-    list_display = ('title', 'tag', 'completed')
+    list_display = ('title', 'task_list', 'tag', 'tag_name', 'completed')
 
 admin.site.register(Task, TaskAdmin)
 
