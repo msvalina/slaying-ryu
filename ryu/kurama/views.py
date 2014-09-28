@@ -30,23 +30,39 @@ def detail(request, task_id):
     task = get_object_or_404(Task, task_id=task_id)
     return render(request, 'kurama/detail.html', {'task': task})
 
-def current_week(request, taskListName):
+def task_list(request, task_list):
+    tasks = get_list_or_404(Task, task_list=task_list)
+    return render(request, 'kurama/task_list.html', {'tasks': tasks })
+
+def stats(request):
+    tasks = get_list_or_404(Task.objects.all())
+    return render(request, 'kurama/stats.html', {'tasks': tasks })
+
+def current_week(request):
     today = date.today()
-    try:
-        taskListName = Task.objects.filter(taskList_id=taskListName,
-            completed__range=["2014-08-01", "2014-10-31"])
-    except taskListName.DoesNotExist:
-        raise Http404
-    return render(request, 'kurama/current_week.html',
-            {'taskListName': taskListName})
+    # TODO write date range logic
+    tasks = get_list_or_404(Task, completed__range=["2014-08-01", "2014-10-31"])
+    return render(request, 'kurama/current_week.html', {'tasks': tasks})
 
 def last_week(request):
     today = date.today()
-    try:
-        taskList = Task.objects.filter(
-            completed__range=["2014-08-01", "2014-10-31"])
-    except taskList.DoesNotExist:
-        raise Http404
-    return render(request, 'kurama/last_week.html',
-            {'taskList': taskList})
+    # TODO write date range logic
+    tasks = get_list_or_404(Task, completed__range=["2014-08-01", "2014-10-31"])
+    return render(request, 'kurama/last_week.html', {'tasks': tasks})
 
+def last_month(request):
+    # TODO write date range logic
+    tasks = get_list_or_404(Task, completed__range=["2014-08-01", "2014-10-31"])
+    return render(request, 'kurama/last_month.html', {'tasks': tasks})
+
+def last_quarter(request):
+    today = date.today()
+    # TODO write date range logic
+    tasks = get_list_or_404(Task, completed__range=["2014-08-01", "2014-10-31"])
+    return render(request, 'kurama/last_quarter.html', {'tasks': tasks})
+
+def last_year(request):
+    today = date.today()
+    # TODO write date range logic
+    tasks = get_list_or_404(Task, completed__range=["2014-08-01", "2014-10-31"])
+    return render(request, 'kurama/last_year.html', {'tasks': tasks})
