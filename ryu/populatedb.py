@@ -10,89 +10,93 @@ from apiclient.discovery import build
 from oauth2client.file import Storage
 from oauth2client.client import OAuth2WebServerFlow
 from oauth2client.tools import run
-from datetime import date
+from datetime import date, timedelta
 from kurama.models import TaskList, Task, Project
 
-FLAGS = gflags.FLAGS
+def auth_helper():
+    """ Setup and return authentication variables"""
+    auth_vars = {}
+
+    try:
+        with open("keys.txt", "r") as kfile:
+            client_id = kfile.readline().rstrip()
+            client_secret = kfile.readline().rstrip()
+            api_key = kfile.readline().rstrip()
+    except IOError:
+        client_id = raw_input("Enter your client id: ")
+        client_secret = raw_input("Enter your client secret: ")
+        api_key = raw_input("Enter your api key: ")
+        write_auth(client_id, client_secret, api_key)
+
+    auth_vars = {'client_id': client_id,
+                 'client_secret': client_secret,
+                 'api_key': api_key}
+
+    return auth_vars
+
+def write_auth(client_id, client_secret, api_key):
+    """ Writing entered clinet_id, client_secret and api_key """
+    with open("keys.txt", "w") as kfile:
+        kfile.write(str(client_id) + "\n")
+        kfile.write(str(client_secret) + "\n")
+        kfile.write(str(api_key) + "\n")
+
+def get_service(client_id='', client_secret='', api_key=''):
+    """ Setup 0Auth 2.0 service for """
+
+    flags = gflags.FLAGS
+    # Set up a Flow object to be used if we need to authenticate. This
+    # sample uses OAuth 2.0, and we set up the OAuth2WebServerFlow with
+    # the information it needs to authenticate. Note that it is called
+    # the Web Server Flow, but it can also handle the flow for native
+    # applications
+    # The client_id and client_secret are copied from the API Access tab on
+    # the Google APIs Console
+    flow = OAuth2WebServerFlow(
+        client_id=client_id,
+        client_secret=client_secret,
+        scope='https://www.googleapis.com/auth/tasks',
+        user_agent='PopulateDB/0.0.1')
+
+    # To disable the local server feature, uncomment the following line:
+    flags.auth_local_webserver = False
+
+    # If the Credentials don't exist or are invalid, run through the native
+    # client flow. The Storage object will ensure that if successful the
+    # good Credentials will get written back to a file.
+    storage = Storage('tasks.dat')
+    credentials = storage.get()
+    if credentials is None or credentials.invalid == True:
+        credentials = run(flow, storage)
+
+    # Create an httplib2.Http object to handle our HTTP requests and
+    # authorize it with our good Credentials.
+    http = httplib2.Http()
+    http = credentials.authorize(http)
+
+    # Build a service object for interacting with the API. Visit
+    # the Google APIs Console
+    # to get a developerKey for your own application.
+    # I used API key for Browser applications
+    service = build(serviceName='tasks', version='v1', http=http,
+        developerKey=api_key)
+
+    return service
+
+def set_env():
+    """ Seting python and django env var """
+    ryu_dir = os.path.dirname(os.path.realpath(__file__))
+    sys.path.append(ryu_dir)
+    os.environ['DJANGO_SETTINGS_MODULE'] = 'ryu.settings'
 
 class PopulateDB(object):
-
-    client_id = ""
-    client_secret = ""
-    api_key = ""
+    """ Populates database with fetched tasklists and tasks """
     service = None
 
     def __init__(self):
-        if os.path.isfile("tasks.dat"):
-            self.get_service()
-            self.set_env()
-        else:
-            try:
-                with open("keys.txt", "r") as kfile:
-                    self.client_id = kfile.readline().rstrip()
-                    self.client_secret = kfile.readline().rstrip()
-                    self.api_key = kfile.readline().rstrip()
-            except IOError:
-                self.client_id = raw_input("Enter your client id: ")
-                self.client_secret = raw_input("Enter your client secret: ")
-                self.api_key = raw_input("Enter your api key: ")
-                self.write_auth()
-            self.get_service()
-            self.set_env()
-
-    def write_auth(self):
-        """ Writing entered clinet_id, client_secret and api_key """
-        with open("keys.txt", "w") as kfile:
-            kfile.write(str(self.client_id) + "\n")
-            kfile.write(str(self.client_secret) + "\n")
-            kfile.write(str(self.api_key) + "\n")
-
-    def get_service(self):
-        """ TODO shift this function outside of PopulateDB bc it does not make
-        sense to be a part of populateDB but it makes sense to use it in
-        __init__ """
-
-        # Set up a Flow object to be used if we need to authenticate. This
-        # sample uses OAuth 2.0, and we set up the OAuth2WebServerFlow with
-        # the information it needs to authenticate. Note that it is called
-        # the Web Server Flow, but it can also handle the flow for native
-        # applications
-        # The client_id and client_secret are copied from the API Access tab on
-        # the Google APIs Console
-        flow = OAuth2WebServerFlow(
-            client_id=self.client_id,
-            client_secret=self.client_secret,
-            scope='https://www.googleapis.com/auth/tasks',
-            user_agent='PopulateDB/0.0.1')
-
-        # To disable the local server feature, uncomment the following line:
-        FLAGS.auth_local_webserver = False
-
-        # If the Credentials don't exist or are invalid, run through the native
-        # client flow. The Storage object will ensure that if successful the
-        # good Credentials will get written back to a file.
-        storage = Storage('tasks.dat')
-        credentials = storage.get()
-        if credentials is None or credentials.invalid == True:
-            credentials = run(flow, storage)
-
-        # Create an httplib2.Http object to handle our HTTP requests and
-        # authorize it with our good Credentials.
-        http = httplib2.Http()
-        http = credentials.authorize(http)
-
-        # Build a service object for interacting with the API. Visit
-        # the Google APIs Console
-        # to get a developerKey for your own application.
-        # I used API key for Browser applications
-        self.service = build(serviceName='tasks', version='v1', http=http,
-                             developerKey=self.api_key)
-
-    def set_env(self):
-        """ Seting python and django env var """
-        ryu_dir = os.path.dirname(os.path.realpath(__file__))
-        sys.path.append(ryu_dir)
-        os.environ['DJANGO_SETTINGS_MODULE'] = 'ryu.settings'
+        auth_vars = auth_helper()
+        self.service = get_service(auth_vars)
+        set_env()
 
     def get_task_lists(self):
         """ Fetch task lists from tasks api and save them in django model """
