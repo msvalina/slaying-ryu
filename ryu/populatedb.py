@@ -74,9 +74,8 @@ def get_service(client_id='', client_secret='', api_key=''):
     http = httplib2.Http()
     http = credentials.authorize(http)
 
-    # Build a service object for interacting with the API. Visit
-    # the Google APIs Console
-    # to get a developerKey for your own application.
+    # Build a service object for interacting with the API. Visit the Google APIs
+    # Console to get a developerKey for your own application.
     # I used API key for Browser applications
     service = build(serviceName='tasks', version='v1', http=http,
         developerKey=api_key)
@@ -84,7 +83,7 @@ def get_service(client_id='', client_secret='', api_key=''):
     return service
 
 def set_env():
-    """ Seting python and django env var """
+    """ Setting python and django env var """
     ryu_dir = os.path.dirname(os.path.realpath(__file__))
     sys.path.append(ryu_dir)
     os.environ['DJANGO_SETTINGS_MODULE'] = 'ryu.settings'
@@ -99,7 +98,8 @@ class PopulateDB(object):
         set_env()
 
     def get_task_lists(self):
-        """ Fetch task lists from tasks api and save them in django model """
+        """ Fetch tasklists and tasks and save them in django model """
+        # TODO separate fetching from saving
         tag_dict = self.get_project_lists()
         task_lists = self.service.tasklists().list().execute()
         # Save every tasklist that's in used_lists to database
@@ -108,54 +108,68 @@ class PopulateDB(object):
             if tskl['title'] in used_lists:
                 print "Saving task list: "
                 print tskl['title']
-                listEntry = TaskList(task_list_id=tskl['id'],
+                list_entry = TaskList(task_list_id=tskl['id'],
                                      title=tskl['title'],
                                      updated=tskl['updated'],
                                      self_link=tskl['selfLink'])
-                listEntry.save()
+                list_entry.save()
 
                 # Get completed tasks from January first 2014 until today
-                # actually tommorow because of otherwise it won't fetch todays
+                # actually tomorrow because of otherwise it won't fetch todays
                 # completed tasks - wired I know...
                 tommorow = date.today() + timedelta(1)
                 tommorow = tommorow.strftime('%Y-%m-%dT00:00:00Z')
                 tasks = self.service.tasks().list(
-                            tasklist=tskl['id'],
-                            completedMin="2014-01-01T00:00:00Z",
-                            completedMax=tommorow,
-                            showHidden="True").execute()
+                    tasklist=tskl['id'],
+                    completedMin="2014-01-01T00:00:00Z",
+                    completedMax=tommorow,
+                    showHidden="True").execute()
+                self.save_tasks(tasks, list_entry, tag_dict)
 
-                for tsk in tasks['items']:
-                    # Set default task tag to *raz* in case there is no tag in
-                    # Project List
-                    task_tag = "*raz*"
-                    task_title = tsk['title'].strip()
-                    print tsk['title']
+                while 'nextPageToken' in tasks:
+                    tasks = self.service.tasks().list(
+                        tasklist=tskl['id'],
+                        completedMin="2014-01-01T00:00:00Z",
+                        completedMax=tommorow,
+                        showHidden="True",
+                        pageToken=tasks['nextPageToken']).execute()
+                    self.save_tasks(tasks, list_entry, tag_dict)
 
-                    # Get task tag from tag_dict insted of directly spliting
-                    # from task name, so now task which has tag without space
-                    # before title can be recongnized correctly
-                    for tag in tag_dict:
-                        if tag in tsk['title']:
-                            task_tag = tag
-                            tag_name = tag_dict[tag]
-                            task_title = string.replace(tsk['title'], tag, "")
-                            task_title = task_title.strip()
-                    # Save fetched task in corresponding db field
-                    taskEntry = Task(task_list=listEntry,
-                                     task_id=tsk['id'],
-                                     tag=task_tag,
-                                     tag_name=tag_name,
-                                     title=task_title,
-                                     updated=tsk['updated'],
-                                     self_link=tsk['selfLink'],
-                                     parent=tsk.get('parent', None),
-                                     position=tsk['position'],
-                                     notes=tsk.get('notes', None),
-                                     status=tsk['status'],
-                                     due=tsk.get('due', None),
-                                     completed=tsk['completed'])
-                    taskEntry.save()
+    def save_tasks(self, tasks, list_entry, tag_dict):
+        """ Save fetched tasks to model """
+        for tsk in tasks['items']:
+            # Set default task tag to *raz* in case there is no tag in
+            # Project List
+            task_tag = "*raz*"
+            tag_name = "razno"
+            task_title = tsk['title'].strip()
+            print tsk['title']
+
+            # Get task tag from tag_dict insted of directly spliting
+            # from task name, so now task which has tag without space
+            # before title can be recongnized correctly
+            for tag in tag_dict:
+                if tag in tsk['title']:
+                    task_tag = tag
+                    tag_name = tag_dict.get('tag')
+                    task_title = string.replace(tsk['title'], tag, "")
+                    task_title = task_title.strip()
+            # Save fetched task in corresponding db field
+            task_entry = Task(task_list=list_entry,
+                             task_id=tsk['id'],
+                             tag=task_tag,
+                             tag_name=tag_name,
+                             title=task_title,
+                             updated=tsk['updated'],
+                             self_link=tsk['selfLink'],
+                             parent=tsk.get('parent', None),
+                             position=tsk['position'],
+                             notes=tsk.get('notes', None),
+                             status=tsk['status'],
+                             due=tsk.get('due', None),
+                             completed=tsk['completed'])
+            task_entry.save()
+
 
     def get_project_lists(self):
         """ Fetch Project List from task api, save it to model and return list
