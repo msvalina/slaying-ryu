@@ -1,0 +1,9 @@
+{% if tasks %}
+    <ul>
+    {% for task in tasks %}
+        <li> {{ task.title }}</li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No tasks are available.</p>
+{% endif %}
