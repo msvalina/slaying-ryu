@@ -1,10 +1,7 @@
-<head>
-    <meta charset="utf-8">
-    <title>Task lists page</title>
-    <script type="text/javascript" charset="utf-8">
-       <link rel="stylesheet" href="/css/master.css" type="text/css" media="screen" title="no title" charset="utf-8">
-   </script>
-</head>
+{% extends "base.html" %}
+
+{% block content %}
+
 {% if latest_im_tasks %}
     <h2> Latest Important tasks </h2>
     <ul>
@@ -26,17 +23,17 @@
     <p>No tasks are available.</p>
 {% endif %}
 {% if tasklists %}
-   <h2 id="">Tasks lists</h2>
-   {% for tl in tasklists %}
+   <h2>Tasks lists</h2>
    <ul>
+   {% for tl in tasklists %}
        <li> <a href="{% url 'kurama:task_list' tl.title %}">{{ tl.title }}</a> </li>
-   </ul>
    {% endfor %}
+   </ul>
 {% else %}
     <p>No task lists are available </p>
 {% endif %}
 
-<h2 id="statistcs_by:">Statistcs by:</h2>
+<h2>Statistcs by:</h2>
 <ul>
     <li><a href="{% url 'kurama:stats' %}">Global stats</a></li>
     <li><a href="{% url 'kurama:current_week' %}">Current week</a></li>
@@ -46,3 +43,4 @@
     <li><a href="{% url 'kurama:last_year' %}">Last year</a></li>
 </ul>
 
+{% endblock content %}
