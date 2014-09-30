@@ -151,7 +151,7 @@ class PopulateDB(object):
             for tag in tag_dict:
                 if tag in tsk['title']:
                     task_tag = tag
-                    tag_name = tag_dict.get('tag')
+                    tag_name = tag_dict.get(task_tag, None)
                     task_title = string.replace(tsk['title'], tag, "")
                     task_title = task_title.strip()
             # Save fetched task in corresponding db field
