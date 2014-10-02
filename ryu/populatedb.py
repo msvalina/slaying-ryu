@@ -91,6 +91,7 @@ def set_env():
 class PopulateDB(object):
     """ Populates database with fetched tasklists and tasks """
     service = None
+    # TODO Query tasklists service api only once in __init__
 
     def __init__(self):
         auth_vars = auth_helper()
@@ -101,6 +102,7 @@ class PopulateDB(object):
         """ Fetch tasklists and tasks and save them in django model """
         # TODO separate fetching from saving
         tag_dict = self.get_project_lists()
+        meta_dict = self.get_meta_info()
         task_lists = self.service.tasklists().list().execute()
         # Save every tasklist that's in used_lists to database
         used_lists = ['01-Im&Ds', '02-Im&Nds', '03-Ni&Ds', '04-Ni&Nds']
@@ -110,6 +112,7 @@ class PopulateDB(object):
                 print tskl['title']
                 list_entry = TaskList(task_list_id=tskl['id'],
                                      title=tskl['title'],
+                                     info=meta_dict.get(tskl['title'], None),
                                      updated=tskl['updated'],
                                      self_link=tskl['selfLink'])
                 list_entry.save()
@@ -195,6 +198,23 @@ class PopulateDB(object):
                     tag_dict[tag] = title
                     print tsk['title']
         return tag_dict
+
+    def get_meta_info(self):
+        """ Fetch Meta info about task lists from task list "Meta list" """
+        task_lists = self.service.tasklists().list().execute()
+        meta_dict = {}
+        for tskl in task_lists['items']:
+            if tskl['title'] == "Meta list":
+                print tskl['title']
+                tasks = self.service.tasks().list(tasklist=tskl['id']).execute()
+                for tsk in tasks['items']:
+                    list_name = tsk['title']
+                    list_info = tsk['notes']
+                    print list_name
+                    print list_info
+                    meta_dict[list_name] = list_info
+
+        return meta_dict
 
 def main():
     populateDB = PopulateDB()
