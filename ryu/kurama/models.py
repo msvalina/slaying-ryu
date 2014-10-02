@@ -5,6 +5,7 @@ class TaskList(models.Model):
     """ Task List model """
     task_list_id = models.CharField(max_length=100)
     title = models.CharField(max_length=50, primary_key=True)
+    info = models.CharField(max_length=1000, null=True, blank=True)
     updated = models.DateTimeField('last modification time')
     self_link = models.URLField('tasks list url')
 

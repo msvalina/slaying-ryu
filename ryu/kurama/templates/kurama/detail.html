@@ -1,13 +1,32 @@
-{% if task %}
-    <h2 id="task">{{ task.title }}</h2>
-    <p>List: {{ task.task_list }} </p>
-    <p>Tag: {{ task.tag }} - {{ task.tag_name }} </p>
-    <p>Updated: {{ task.updated }} </p>
-    <p>Notes: {{ task.notes }} </p>
-    <p>Status: {{ task.status }} </p>
-    <p>Due: {{ task.due }} </p>
-    <p>Completed: {{ task.completed }} </p>
+{% extends "base.html" %}
 
+{% block content %}
+
+<div class="page-header">
+    <br>
+    <h1>Task details</h1>
+</div>
+
+<div class="col-md-8">
+{% if task %}
+    <ul class="list-group">
+        <li class="list-group-item active">
+        <h4 class="list-group-item-heading">{{ task.title }}</h4>
+        </li>
+        <li class="list-group-item">List: {{ task.task_list }} </li>
+        <li class="list-group-item">Tag: {{ task.tag }} </li>
+        <li class="list-group-item">List: {{ task.task_list }} </li>
+        <li class="list-group-item">Tag: {{ task.tag }} - {{ task.tag_name }}
+        </li>
+        <li class="list-group-item">Updated: {{ task.updated }} </li>
+        <li class="list-group-item">Notes: {{ task.notes }} </li>
+        <li class="list-group-item">Status: {{ task.status }} </li>
+        <li class="list-group-item">Due: {{ task.due }} </li>
+        <li class="list-group-item">Completed: {{ task.completed }} </li>
+    </ul>
 {% else %}
     <p>No task are available.</p>
 {% endif %}
+</div>
+
+{% endblock content %}

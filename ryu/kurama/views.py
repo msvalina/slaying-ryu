@@ -32,7 +32,9 @@ def detail(request, task_id):
 
 def task_list(request, task_list):
     tasks = get_list_or_404(Task, task_list=task_list)
-    return render(request, 'kurama/task_list.html', {'tasks': tasks })
+    context = {'task_list': task_list,
+               'tasks': tasks }
+    return render(request, 'kurama/task_list.html', context)
 
 def stats(request):
     tasks = get_list_or_404(Task.objects.all())

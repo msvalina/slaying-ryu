@@ -1,9 +1,19 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-header">
+    <br>
+    <h1>Complete list of tasks from {{ task_list }}</h1>
+</div>
+
 {% if tasks %}
-    <ul>
+    <ul class="list-group">
     {% for task in tasks %}
-        <li> {{ task.title }}</li>
+        <li class="list-group-item> {{ task.title }}</li>
     {% endfor %}
     </ul>
 {% else %}
     <p>No tasks are available.</p>
 {% endif %}
+{% endblock content %}

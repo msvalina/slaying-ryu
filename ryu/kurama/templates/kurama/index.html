@@ -6,6 +6,7 @@
     <br>
     <h1>Latest completed tasks</h1>
 </div>
+
 <div class="row">
     <div class="col-sm-4">
         {% if latest_im_tasks %}
@@ -39,13 +40,13 @@
         {% if tasklists %}
             <ul class="list-group">
                 <li class="list-group-item active">
-                <h4 class="list-group-item-heading">List tasks</h4>
+                <h4 class="list-group-item-heading">Tasks lists</h4>
                 </li>
             {% for tl in tasklists %}
                 <li class="list-group-item">
                 <h5 class="list-group-item-heading">
                 <a href="{% url 'kurama:task_list' tl.title %}">{{ tl.title }}</a>
-                <p class="list-group-item-text"> {{ tl.description }}task list description </p>
+                <p class="list-group-item-text"> {{ tl.info }}</p>
                 </h5>
                 </li>
             {% endfor %}
@@ -57,7 +58,7 @@
 </div>
 <div class="row">
     <div class="col-sm-4">
-        <h2>Statistcs by:</h2>
+        <h2>Statistcs by</h2>
         <ul class="list-group">
             <li class="list-group-item"><a href="{% url 'kurama:stats' %}">Global stats</a></li>
             <li class="list-group-item"><a href="{% url 'kurama:current_week' %}">Current week</a></li>
