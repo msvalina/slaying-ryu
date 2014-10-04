@@ -36,8 +36,9 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'kurama',
+    'south',
     'bootstrap3',
+    'kurama',
 )
 
 MIDDLEWARE_CLASSES = (
