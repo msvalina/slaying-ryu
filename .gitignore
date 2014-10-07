@@ -1,5 +1,5 @@
 ryu/db.sqlite3
 ryu/tags
-ryu/keys.txt
-ryu/tasks.dat
+ryu/kurama/management/commands/keys.txt
+ryu/kurama/management/commands/tasks.dat
 *.pyc

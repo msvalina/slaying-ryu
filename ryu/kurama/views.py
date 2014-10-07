@@ -3,6 +3,7 @@ from itertools import chain
 from operator import attrgetter
 from django.http import Http404
 from django.shortcuts import render, get_object_or_404, get_list_or_404
+from django.core.management import call_command
 from kurama.models import TaskList, Task, Project
 
 def index(request):
@@ -68,3 +69,9 @@ def last_year(request):
     # TODO write date range logic
     tasks = get_list_or_404(Task, completed__range=["2014-08-01", "2014-10-31"])
     return render(request, 'kurama/last_year.html', {'tasks': tasks})
+
+def populate(request):
+    # TODO write date range logic
+    call_command('populate_db', 'kurama', interactive=False)
+    return render(request, 'kurama/populate.html')
+

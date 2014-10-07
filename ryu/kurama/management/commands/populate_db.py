@@ -6,19 +6,29 @@ import os
 import string
 import gflags
 import httplib2
+import shutil
+from subprocess import check_output
+from os.path import basename, dirname, abspath, join
 from apiclient.discovery import build
 from oauth2client.file import Storage
 from oauth2client.client import OAuth2WebServerFlow
 from oauth2client.tools import run
 from datetime import date, timedelta
+from django.core.management.base import AppCommand, CommandError
+from django.core.management import call_command
+from south.models import MigrationHistory
 from kurama.models import TaskList, Task, Project
+
+SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
+KEYS_FILE = SCRIPT_DIR + "/keys.txt"
+TASKS_DAT = SCRIPT_DIR + "/tasks.dat"
 
 def auth_helper():
     """ Setup and return authentication variables"""
     auth_vars = {}
 
     try:
-        with open("keys.txt", "r") as kfile:
+        with open(KEYS_FILE, "r") as kfile:
             client_id = kfile.readline().rstrip()
             client_secret = kfile.readline().rstrip()
             api_key = kfile.readline().rstrip()
@@ -36,7 +46,7 @@ def auth_helper():
 
 def write_auth(client_id, client_secret, api_key):
     """ Writing entered clinet_id, client_secret and api_key """
-    with open("keys.txt", "w") as kfile:
+    with open(KEYS_FILE, "w") as kfile:
         kfile.write(str(client_id) + "\n")
         kfile.write(str(client_secret) + "\n")
         kfile.write(str(api_key) + "\n")
@@ -64,7 +74,7 @@ def get_service(client_id='', client_secret='', api_key=''):
     # If the Credentials don't exist or are invalid, run through the native
     # client flow. The Storage object will ensure that if successful the
     # good Credentials will get written back to a file.
-    storage = Storage('tasks.dat')
+    storage = Storage(TASKS_DAT)
     credentials = storage.get()
     if credentials is None or credentials.invalid == True:
         credentials = run(flow, storage)
@@ -85,14 +95,54 @@ def get_service(client_id='', client_secret='', api_key=''):
 def set_env():
     """ Setting python and django env var """
     ryu_dir = os.path.dirname(os.path.realpath(__file__))
+    print ryu_dir
     sys.path.append(ryu_dir)
     os.environ['DJANGO_SETTINGS_MODULE'] = 'ryu.settings'
 
+class Command(AppCommand):
+    help = """
+    Clear app (with manage.py sqlclear) and south migrations for app and
+    populate DB"""
+    def handle_app(self, app, verbosity=1, **options):
+        printer = Printer(verbosity=verbosity)
+        app_name = basename(dirname(app.__file__))
+        migrations_dir = abspath(join(dirname(app.__file__), 'migrations'))
+        py_mng = "python manage.py "
+        printer('Clearing ' + app_name)
+        cmd = py_mng + "sqlclear %s | python manage.py dbshell " % app_name
+        printer(check_output(cmd, shell=True), verbosity=2)
+        printer('Deleting migrations dir')
+        try:
+            shutil.rmtree(migrations_dir)
+        except OSError:
+            printer('Failed to delete migrations folder, probably doesnt exist')
+        printer('Creating initial schemamigration')
+        cmd2 = py_mng + "schemamigration --initial %s" % app_name
+        printer(check_output(cmd2, shell=True), verbosity=2)
+        printer('Syncing database')
+        cmd3 = py_mng + "syncdb"
+        printer(check_output(cmd3, shell=True), verbosity=2)
+        printer("Fake zero migrate")
+        cmd4 = py_mng + "migrate --fake %s zero" % app_name
+        printer(check_output(cmd4, shell=True), verbosity=2)
+        printer("Migarating to new initial")
+        cmd5 = py_mng + "migrate %s" % app_name
+        printer(check_output(cmd5, shell=True), verbosity=2)
+        populate_db = PopulateDB()
+        populate_db.get_task_lists()
+
+class Printer(object):
+    """ Printer object for printing output"""
+    def __init__(self, verbosity=1):
+        self.verbosity = int(verbosity)
+    def __call__(self, out, verbosity=1, prefix='***'):
+        if verbosity <= self.verbosity:
+            print prefix, out
+
 class PopulateDB(object):
     """ Populates database with fetched tasklists and tasks """
-    service = None
     # TODO Query tasklists service api only once in __init__
-
+    service = None
     def __init__(self):
         auth_vars = auth_helper()
         self.service = get_service(auth_vars)
@@ -194,9 +244,9 @@ class PopulateDB(object):
                         status=tsk['status'],
                         due=tsk.get('due', None),
                         completed=tsk.get('completed', None))
+                    print "Saving project entry: " + tsk['title']
                     projectEntry.save()
                     tag_dict[tag] = title
-                    print tsk['title']
         return tag_dict
 
     def get_meta_info(self):
@@ -217,8 +267,8 @@ class PopulateDB(object):
         return meta_dict
 
 def main():
-    populateDB = PopulateDB()
-    populateDB.get_task_lists()
+    populate_db = PopulateDB()
+    populate_db.get_task_lists()
 
 if __name__ == '__main__':
     main()
