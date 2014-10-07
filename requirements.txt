@@ -1,5 +1,16 @@
 Django==1.6.6
+Jinja2==2.7.3
+MarkupSafe==0.23
+South==1.0
+Unidecode==0.04.16
 argparse==1.2.1
+django-bootstrap3==4.11.0
+django-nvd3==0.7.6
 google-api-python-client==1.2
 httplib2==0.9
+ipdb==0.8
+ipython==2.2.0
+python-gflags==2.0
+python-nvd3==0.13.3
+python-slugify==0.0.9
 wsgiref==0.1.2
