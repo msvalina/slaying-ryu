@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load nvd3_tags %}
 
 {% block extrahead %}
 
@@ -7,6 +8,7 @@
 
 {% endblock extrahead %}
 
+
 {% block content %}
 
 <div class="page-header">
@@ -14,6 +16,7 @@
     <h1>Piechart presenting number of tasks per project/tag</h1>
     <h2>Filterd by important task lists from 2014-01-01 - until last update</h2>
 </div>
-    {% include_container chartcontainer 600 800 %}
+
+{% include_container chartcontainer 600 800 %}
 
 {% endblock content %}
