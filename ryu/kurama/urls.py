@@ -12,4 +12,5 @@ urlpatterns = patterns('',
             url(r'^last_quarter$', views.last_quarter, name='last_quarter'),
             url(r'^last_year$', views.last_year, name='last_year'),
             url(r'^populate$', views.populate, name='populate'),
+            url(r'^graph$', views.graph, name='graph'),
             )
