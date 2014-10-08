@@ -14,8 +14,9 @@ Transitional//EN"
 <meta name="description" content="Kurama is app for statistcal analysis of
 completed tasks that will help with evaulations and retrospectives of completed
 work." />
-{# Load the tag library #}
+{# Load the tag libraries #}
 {% load bootstrap3 %}
+{% load nvd3_tags %}
 
 {# Load CSS and JavaScript #}
 {% bootstrap_css %}
@@ -23,6 +24,10 @@ work." />
 
 {# Display django.contrib.messages as Bootstrap alerts #}
 {% bootstrap_messages %}
+
+{% block extrahead %} {% endblock extrahead %}
+
+</head>
 
 <body>
     <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
@@ -51,5 +56,4 @@ work." />
     </div><!-- /.container -->
 
 </body>
-</head>
 </html>

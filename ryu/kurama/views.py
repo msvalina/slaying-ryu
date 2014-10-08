@@ -1,6 +1,6 @@
 from datetime import date, timedelta
 from itertools import chain
-from operator import attrgetter
+from operator import attrgetter, itemgetter
 from django.http import Http404
 from django.shortcuts import render, get_object_or_404, get_list_or_404, render_to_response
 from django.core.management import call_command
@@ -41,14 +41,23 @@ def graph(request):
     """
     pieChart page
     """
-    xdata = ["Apple", "Apricot", "Avocado", "Banana", "Boysenberries",
-             "Blueberries", "Dates", "Grapefruit", "Kiwi", "Lemon"]
-    ydata = [52, 48, 160, 94, 75, 71, 490, 82, 46, 17]
+    projects = Project.objects.all()
+    projects_num_of_tasks = {}
+    for proj in projects:
+        count = Task.objects.filter(tag_name=proj.name, task_list__title__contains="Im").count()
+        projects_num_of_tasks[proj.name]=count
+    sorted_projects_by_num_of_tasks = []
+    sorted_projects_by_num_of_tasks = sorted(projects_num_of_tasks.items(),
+                                             key=itemgetter(1), 
+                                             reverse=True)[:10]
+
+    xdata = [project[0] for project in sorted_projects_by_num_of_tasks]
+    ydata = [x[1] for x in sorted_projects_by_num_of_tasks]
 
     color_list = ['#5d8aa8', '#e32636', '#efdecd', '#ffbf00', '#ff033e', '#a4c639',
                   '#b2beb5', '#8db600', '#7fffd4', '#ff007f', '#ff55a3', '#5f9ea0']
     extra_serie = {
-        "tooltip": {"y_start": "", "y_end": " cal"},
+        "tooltip": {"y_start": "", "y_end": " tasks"},
         "color_list": color_list
     }
     chartdata = {'x': xdata, 'y1': ydata, 'extra1': extra_serie}

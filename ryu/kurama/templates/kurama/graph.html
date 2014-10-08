@@ -1,9 +1,19 @@
-{% load nvd3_tags %}
-<head>
-    {% include_chart_jscss %}
-    {% load_chart charttype chartdata chartcontainer extra %}
-</head>
-<body>
-    <h1>Fruits vs Calories</h1>
-    {% include_container chartcontainer %}
-</body>
+{% extends "base.html" %}
+
+{% block extrahead %}
+
+{% include_chart_jscss %}
+{% load_chart charttype chartdata chartcontainer extra %}
+
+{% endblock extrahead %}
+
+{% block content %}
+
+<div class="page-header">
+    <br>
+    <h1>Piechart presenting number of tasks per project/tag</h1>
+    <h2>Filterd by important task lists from 2014-01-01 - until last update</h2>
+</div>
+    {% include_container chartcontainer 600 800 %}
+
+{% endblock content %}
