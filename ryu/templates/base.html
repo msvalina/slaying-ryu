@@ -38,13 +38,14 @@ work." />
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="#">Slaying Ryu</a>
+          <a class="navbar-brand" href="{% url 'ryu' %}">Slaying Ryu</a>
         </div>
         <div class="collapse navbar-collapse">
           <ul class="nav navbar-nav">
-            <li class="active"><a href="#">Kurama</a></li>
-            <li><a href="#about">Stats</a></li>
-            <li><a href="#contact">About</a></li>
+            <li class="active"><a href="{% url 'kurama:index' %}">Kurama</a></li>
+            <li><a href="{% url 'kurama:stats' %}">Stats</a></li>
+            <li><a href="{% url 'kurama:about' %}">About</a></li>
+            <li><a href="{% url 'kurama:populate' %}">Update</a></li>
           </ul>
         </div><!--/.nav-collapse -->
       </div>

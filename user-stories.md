@@ -1,9 +1,12 @@
-## Ryu - program for analysis and evaluation of time management system
+## Ryu - Project for devloping app for analysis and evaluation of time
+management system
 
 ### Why Ryu?
-**Ryu** is a japanesee dragon with three claws!!! And I'm gonna slay that
-dragon! Also this project is about time management (croat. raspolaganje
-vremenom) so that's why Ryu. 
+**Ryu** is a Japanese dragon with three claws!!! And I'm gonna slay that
+dragon! Haha. Essentially it's my attempt at going against my fear of
+thinking that I can't be good programmer! Also this project is about time
+management (croat. raspolaganje vremenom) so that's why I'm making app Kurama
+that will slay Ryu :-) 
 
 ### User Story 01
 As a user I want to easily connect with gmail tasks app and use Ryu.

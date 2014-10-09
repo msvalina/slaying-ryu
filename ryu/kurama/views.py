@@ -37,6 +37,13 @@ def task_list(request, task_list):
                'tasks': tasks}
     return render(request, 'kurama/task_list.html', context)
 
+def stats(request):
+    tasks = get_list_or_404(Task.objects.all())
+    return render(request, 'kurama/stats.html', {'tasks': tasks })
+
+def about(request):
+    return render(request, 'kurama/about.html')
+
 def graph(request):
     """
     pieChart page
@@ -77,10 +84,6 @@ def graph(request):
     }
 
     return render_to_response('kurama/graph.html', data)
-
-def stats(request):
-    tasks = get_list_or_404(Task.objects.all())
-    return render(request, 'kurama/stats.html', {'tasks': tasks })
 
 def current_week(request):
     today = date.today()
