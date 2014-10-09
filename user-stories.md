@@ -24,11 +24,11 @@ categories (IM and NIM)
 As an admin I want to sort Tasks by completed field on django admin change
 list page
 
-### User Story 05
+### User Story 05 -- DONE
 As a user I want to have nice representation of data with some JS library that
 will draw nice Pie diagrams
 
-### User Story 06
+### User Story 06 -- DONE
 As a user I want to have function to manualy sync db with latest tasks
 
 # vim: tw=78

@@ -1,5 +1,4 @@
-## Ryu - Project for developing Django app for analysis and evaluation of time
-management system
+## Slaying Ryu - Project for developing Django app for analysis and evaluation of time management system
 
 App is fetching completed tasks from Google Tasks API and idea is to have nice
 statistical presentation for analysis and evaluation of completed work.
