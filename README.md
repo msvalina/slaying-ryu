@@ -13,6 +13,12 @@ Pausch. Idea is that TO-DO lists are organized by four categories:
 Also every task has a tag which represents project or group of taks so
 statistics can be easly filterd by it.
 
+Project is using:
+* south - for database migrations
+* bootstrap3 - for UI
+* djangobower - for easy install of bower apps jquery, d3.js etc.
+* django nvd3 - for beautifull charts
+
 ### Why Ryu?
 **Ryu** is a Japanese dragon with three claws!!! And I'm gonna slay that
 dragon! Haha. Essentially it's my attempt at going against my fear of
