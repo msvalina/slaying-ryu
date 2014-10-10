@@ -21,9 +21,26 @@ def index(request):
 
     tasklists = get_list_or_404(TaskList.objects.all())
 
+    # Implement in models.py Task, function for returning popular projects
+    projects = Project.objects.all()
+    numb_of_task_per_project = {}
+    for proj in projects:
+        count = Task.objects.filter(tag_name=proj.name,
+                                    task_list__title__contains="Im").count()
+        numb_of_task_per_project[proj.name] = count
+    # popular projects by number of completed tasks
+    popular_projects = []
+    popular_projects = sorted(numb_of_task_per_project.items(),
+                              key=itemgetter(1),
+                              reverse=True)[:10]
+
+    projects = [x[0] for x in popular_projects]
+
     context = {'latest_im_tasks': latest_im_tasks,
                'latest_ni_tasks': latest_ni_tasks,
-               'tasklists' : tasklists}
+               'tasklists': tasklists,
+               'projects': projects}
+
 
     return render(request, 'kurama/index.html', context)
 
@@ -37,6 +54,18 @@ def task_list(request, task_list):
                'tasks': tasks}
     return render(request, 'kurama/task_list.html', context)
 
+def tag(request, tag):
+    tasks = get_list_or_404(Task, tag=tag)
+    context = {'tag': tag,
+               'tasks': tasks}
+    return render(request, 'kurama/tag.html', context)
+
+def tagname(request, tagname):
+    tasks = get_list_or_404(Task, tag_name=tagname)
+    context = {'tag': tagname,
+               'tasks': tasks}
+    return render(request, 'kurama/tag.html', context)
+
 def stats(request):
     tasks = get_list_or_404(Task.objects.all())
     return render(request, 'kurama/stats.html', {'tasks': tasks })
@@ -46,23 +75,26 @@ def about(request):
 
 def graph(request):
     """
-    pieChart page
+    pieChart example
     """
     projects = Project.objects.all()
-    projects_num_of_tasks = {}
+    numb_of_task_per_project = {}
     for proj in projects:
-        count = Task.objects.filter(tag_name=proj.name, task_list__title__contains="Im").count()
-        projects_num_of_tasks[proj.name]=count
-    sorted_projects_by_num_of_tasks = []
-    sorted_projects_by_num_of_tasks = sorted(projects_num_of_tasks.items(),
-                                             key=itemgetter(1), 
-                                             reverse=True)[:10]
+        count = Task.objects.filter(tag_name=proj.name,
+                                    task_list__title__contains="Im").count()
+        numb_of_task_per_project[proj.name] = count
+    # popular projects by number of completed tasks
+    popular_projects = []
+    popular_projects = sorted(numb_of_task_per_project.items(),
+                              key=itemgetter(1),
+                              reverse=True)[:10]
 
-    xdata = [project[0] for project in sorted_projects_by_num_of_tasks]
-    ydata = [x[1] for x in sorted_projects_by_num_of_tasks]
+    xdata = [x[0] for x in popular_projects]
+    ydata = [x[1] for x in popular_projects]
 
-    color_list = ['#5d8aa8', '#e32636', '#efdecd', '#ffbf00', '#ff033e', '#a4c639',
-                  '#b2beb5', '#8db600', '#7fffd4', '#ff007f', '#ff55a3', '#5f9ea0']
+    color_list = ['#5d8aa8', '#e32636', '#efdecd', '#ffbf00', '#ff033e',
+                  '#a4c639', '#b2beb5', '#8db600', '#7fffd4', '#ff007f',
+                  '#ff55a3', '#5f9ea0']
     extra_serie = {
         "tooltip": {"y_start": "", "y_end": " tasks"},
         "color_list": color_list

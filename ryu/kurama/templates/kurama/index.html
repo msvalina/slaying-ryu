@@ -58,8 +58,9 @@
 </div>
 <div class="row">
     <div class="col-sm-4">
-        <h2>Statistcs by</h2>
         <ul class="list-group">
+            <li class="list-group-item active">
+            <h4 class="list-group-item-heading">Statistcs by</h4>
             <li class="list-group-item"><a href="{% url 'kurama:stats' %}">Global stats</a></li>
             <li class="list-group-item"><a href="{% url 'kurama:current_week' %}">Current week</a></li>
             <li class="list-group-item"><a href="{% url 'kurama:last_week' %}">Last week</a></li>
@@ -67,6 +68,22 @@
             <li class="list-group-item"><a href="{% url 'kurama:last_quarter' %}">Last quarter</a></li>
             <li class="list-group-item"><a href="{% url 'kurama:last_year' %}">Last year</a></li>
         </ul>
+    </div>
+    <div class="col-sm-4">
+        {% if projects %}
+            <ul class="list-group">
+                <li class="list-group-item active">
+                <h4 class="list-group-item-heading">Popular projects/task group</h4>
+                </li>
+            {% for proj in projects %}
+                <li class="list-group-item">
+                <a href="{% url 'kurama:tagname' proj %}">{{ proj }}</a>
+                </li>
+            {% endfor %}
+            </ul>
+        {% else %}
+            <p>No projects are available </p>
+        {% endif %}
     </div>
 </div>
 
