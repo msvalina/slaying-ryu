@@ -5,6 +5,8 @@ South==1.0
 Unidecode==0.04.16
 argparse==1.2.1
 django-bootstrap3==4.11.0
+django-bower==5.0.1
+django-debug-toolbar==1.2.1
 django-nvd3==0.7.6
 google-api-python-client==1.2
 httplib2==0.9
@@ -13,4 +15,6 @@ ipython==2.2.0
 python-gflags==2.0
 python-nvd3==0.13.3
 python-slugify==0.0.9
+six==1.8.0
+sqlparse==0.1.13
 wsgiref==0.1.2
