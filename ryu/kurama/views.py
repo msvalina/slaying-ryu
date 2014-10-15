@@ -9,20 +9,27 @@ from kurama.models import TaskList, Task, Project
 def index(request):
     """ Get latest Important and Not important tasks chain and sort querysets
     and return render response """
-    latest_imds_tasks = get_list_or_404(Task, task_list="01-Im&Ds")[:5]
-    latest_imnds_tasks = get_list_or_404(Task, task_list="02-Im&Nds")[:5]
-    latest_im_tasks = sorted(chain(latest_imds_tasks, latest_imnds_tasks),
-        key=attrgetter('completed'), reverse=True)[:5]
 
-    latest_nids_tasks = get_list_or_404(Task, task_list="03-Ni&Ds")[:5]
-    latest_ninds_tasks = get_list_or_404(Task, task_list="04-Ni&Nds")[:5]
-    latest_ni_tasks = sorted(chain(latest_nids_tasks, latest_ninds_tasks),
-        key=attrgetter('completed'), reverse=True)[:5]
+    latest_imds = get_list_or_404(Task.objects.order_by('-completed'),
+                                  task_list="01-Im&Ds")[:5]
+    latest_imnds = get_list_or_404(Task.objects.order_by('-completed'),
+                                   task_list="02-Im&Nds")[:5]
+    latest_im = sorted(chain(latest_imds, latest_imnds),
+                       key=attrgetter('completed'),
+                       reverse=True)[:5]
+
+    latest_nids = get_list_or_404(Task.objects.order_by('-completed'),
+                                  task_list="03-Ni&Ds")[:5]
+    latest_ninds = get_list_or_404(Task.objects.order_by('-completed'),
+                                   task_list="04-Ni&Nds")[:5]
+    latest_ni = sorted(chain(latest_nids, latest_ninds),
+                       key=attrgetter('completed'), 
+                       reverse=True)[:5]
 
     tasklists = get_list_or_404(TaskList.objects.all())
 
-    # Implement in models.py Task, function for returning popular projects
-    projects = Project.objects.all()
+    # TODO Implement in models.py Task, function for returning popular projects
+    projects = get_list_or_404(Project)
     numb_of_task_per_project = {}
     for proj in projects:
         count = Task.objects.filter(tag_name=proj.name,
@@ -36,11 +43,10 @@ def index(request):
 
     projects = [x[0] for x in popular_projects]
 
-    context = {'latest_im_tasks': latest_im_tasks,
-               'latest_ni_tasks': latest_ni_tasks,
+    context = {'latest_im_tasks': latest_im,
+               'latest_ni_tasks': latest_ni,
                'tasklists': tasklists,
                'projects': projects}
-
 
     return render(request, 'kurama/index.html', context)
 
@@ -68,7 +74,7 @@ def tagname(request, tagname):
 
 def stats(request):
     tasks = get_list_or_404(Task.objects.all())
-    return render(request, 'kurama/stats.html', {'tasks': tasks })
+    return render(request, 'kurama/stats.html', {'tasks': tasks})
 
 def about(request):
     return render(request, 'kurama/about.html')
