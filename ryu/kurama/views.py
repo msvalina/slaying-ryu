@@ -124,10 +124,16 @@ def graph(request):
     return render_to_response('kurama/graph.html', data)
 
 def current_week(request):
+    # get tasks from current week, week starts from saturday
     today = date.today()
-    # TODO write date range logic
-    tasks = get_list_or_404(Task, completed__range=["2014-08-01", "2014-10-31"])
-    return render(request, 'kurama/current_week.html', {'tasks': tasks})
+    # offset/delta from current week day till saturday,
+    # "last saturday" can't be same as "today"
+    offset = (today.weekday() + 1) % 7 + 1
+    last_saturday = today - timedelta(days=offset)
+    current_week = Task.objects.filter(completed__range=[last_saturday, today])
+    date_range = {'start_date': last_saturday, 'end_date': today}
+    return render(request, 'kurama/current_week.html', {'tasks': current_week,
+                                                 'date_range': date_range})
 
 def last_week(request):
     today = date.today()
