@@ -1,4 +1,5 @@
 from datetime import date, timedelta
+from calendar import monthrange
 from itertools import chain
 from operator import attrgetter, itemgetter
 from django.http import Http404
@@ -72,9 +73,67 @@ def tagname(request, tagname):
                'tasks': tasks}
     return render(request, 'kurama/tag.html', context)
 
-def stats(request):
-    tasks = get_list_or_404(Task.objects.all())
-    return render(request, 'kurama/stats.html', {'tasks': tasks})
+def stats(request, time_range="thisweek", tl="all"):
+    start_date = None
+    end_date = None
+    tasks = None
+    today = date.today()
+    if time_range == "thisweek":
+        # offset/delta from current week day till saturday,
+        # "last saturday" can't be same as "today"
+        offset = (today.weekday() + 1) % 7 + 1
+        last_saturday = today - timedelta(days=offset)
+        start_date = last_saturday
+        end_date = today
+    elif time_range == "lastweek":
+        offset = (today.weekday() + 2) % 7 + 1
+        friday = today - timedelta(days=offset)
+        saturday = friday - timedelta(days=6)
+        start_date = saturday
+        end_date = friday
+    elif time_range == "thismonth":
+        start_date = date(today.year, today.month, 1)
+        num_of_days_in_month = monthrange(today.year, today.month)[1]
+        end_date = start_date + timedelta(days=num_of_days_in_month - 1)
+    elif time_range == "lastmonth":
+        start_date = date(today.year, today.month - 1, 1)
+        num_of_days_in_month = monthrange(today.year, today.month - 1)[1]
+        end_date = start_date + timedelta(days=num_of_days_in_month - 1)
+    elif time_range == "thisquarter":
+        start_date = date(today.year, today.month - 1, 1)
+        num_of_days_in_quarter = monthrange(today.year, today.month - 1)[1]
+        end_date = start_date + timedelta(days=num_of_days_in_month - 1)
+
+    else:
+        # set this week
+        offset = (today.weekday() + 1) % 7 + 1
+        last_saturday = today - timedelta(days=offset)
+        start_date = last_saturday
+        end_date = today
+
+    if tl == "im":
+        tasks = Task.objects.filter(completed__range=[start_date, end_date],
+                                    task_list__title__contains="Im")
+        task_lists = "Important"
+    elif tl == "nim":
+        tasks = Task.objects.filter(completed__range=[start_date, end_date],
+                                    task_list__title__contains="Ni")
+        task_lists = "Not important"
+    elif tl == "all":
+        tasks = Task.objects.filter(completed__range=[start_date, end_date])
+        task_lists = "All"
+    else:
+        tasks = Task.objects.filter(completed__range=[start_date, end_date])
+        task_lists = "All"
+        # count = Task.objects.filter(tag_name=proj.name,
+        #                             task_list__title__contains="Im").count()
+
+    query_info = {'start_date': start_date, 
+                  'end_date': end_date, 
+                  'task_lists': task_lists,
+                  'tag': tag}
+    return render(request, 'kurama/stats.html', {'tasks': tasks,
+                                                 'query_info': query_info})
 
 def about(request):
     return render(request, 'kurama/about.html')
@@ -134,29 +193,6 @@ def current_week(request):
     date_range = {'start_date': last_saturday, 'end_date': today}
     return render(request, 'kurama/current_week.html', {'tasks': current_week,
                                                  'date_range': date_range})
-
-def last_week(request):
-    today = date.today()
-    # TODO write date range logic
-    tasks = get_list_or_404(Task, completed__range=["2014-08-01", "2014-10-31"])
-    return render(request, 'kurama/last_week.html', {'tasks': tasks})
-
-def last_month(request):
-    # TODO write date range logic
-    tasks = get_list_or_404(Task, completed__range=["2014-08-01", "2014-10-31"])
-    return render(request, 'kurama/last_month.html', {'tasks': tasks})
-
-def last_quarter(request):
-    today = date.today()
-    # TODO write date range logic
-    tasks = get_list_or_404(Task, completed__range=["2014-08-01", "2014-10-31"])
-    return render(request, 'kurama/last_quarter.html', {'tasks': tasks})
-
-def last_year(request):
-    today = date.today()
-    # TODO write date range logic
-    tasks = get_list_or_404(Task, completed__range=["2014-08-01", "2014-10-31"])
-    return render(request, 'kurama/last_year.html', {'tasks': tasks})
 
 def populate(request):
     # TODO write date range logic
