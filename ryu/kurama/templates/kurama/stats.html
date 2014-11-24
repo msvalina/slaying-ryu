@@ -1,20 +1,26 @@
+{# vim:set et sw=2 ts=2 sts=2 tw=120: #}
 {% extends "base.html" %}
 
 {% block content %}
 
 <div class="page-header">
-    <br>
-    <h1>Stats from {{ query_info.start_date }} to {{ query_info.end_date }}</h1>
+  <br>
+  <h1>Stats from {{ query_info.start_date }} to {{ query_info.end_date }}</h1>
 </div>
 
+<div class="col-md-8">
 {% if tasks %}
-    <ul class="list-group">
-    {% for task in tasks %}
-        <li class="list-group-item> {{ task.title }}</li>
-    {% endfor %}
-    </ul>
+  <ul class="list-group">
+  {% for task in tasks %}
+    <li class="list-group-item"> 
+    <a href="{% url 'kurama:task_list' task.task_list.title %}"> {{ task.task_list.title }}</a> -
+    <a href="{% url 'kurama:tag' task.tag %}"> {{ task.tag }}</a> -
+    <a href="{% url 'kurama:detail' task.task_id %}"> {{ task.title }}</a>
+    </li>
+  {% endfor %}
+  </ul>
 {% else %}
-    <p>No tasks are available.</p>
+  <p>No tasks are available.</p>
 {% endif %}
 
 {% endblock content %}
