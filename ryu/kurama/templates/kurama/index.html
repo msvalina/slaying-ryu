@@ -1,86 +1,87 @@
+{# vim:set et sw=2 ts=2 sts=2 tw=120: #}
 {% extends "base.html" %}
 
 {% block content %}
 
 <div class="page-header">
-    <br>
-    <h1>Latest completed tasks</h1>
+  <br>
+  <h1>Latest completed tasks</h1>
 </div>
 
 <div class="row">
-    <div class="col-sm-4">
-        {% if latest_im_tasks %}
-            <ul class="list-group">
-            <li class="list-group-item active">
-                <h4 class="list-group-item-heading">Important Tasks</h4>
-            </li>
-            {% for task in latest_im_tasks %}
-                <li class="list-group-item"><a href="{% url 'kurama:detail' task.task_id %}">{{ task.task_list}} - {{ task.title }}</a></li>
-            {% endfor %}
-            </ul>
-        {% else %}
-            <p>No tasks are available.</p>
-        {% endif %}
-    </div>
-    <div class="col-sm-4">
-        {% if latest_ni_tasks %}
-            <li class="list-group-item active">
-                <h4 class="list-group-item-heading">Not Important Tasks</h4>
-            </li>
-            <ul class="list-group">
-            {% for task in latest_ni_tasks %}
-                <li class="list-group-item"><a href="{% url 'kurama:detail' task.task_id %}">{{ task.task_list}} - {{ task.title }}</a></li>
-            {% endfor %}
-            </ul>
-        {% else %}
-            <p>No tasks are available.</p>
-        {% endif %}
-    </div>
-    <div class="col-sm-4">
-        {% if tasklists %}
-            <ul class="list-group">
-                <li class="list-group-item active">
-                <h4 class="list-group-item-heading">Tasks lists</h4>
-                </li>
-            {% for tl in tasklists %}
-                <li class="list-group-item">
-                <h5 class="list-group-item-heading">
-                <a href="{% url 'kurama:task_list' tl.title %}">{{ tl.title }}</a>
-                <p class="list-group-item-text"> {{ tl.info }}</p>
-                </h5>
-                </li>
-            {% endfor %}
-            </ul>
-        {% else %}
-            <p>No task lists are available </p>
-        {% endif %}
-    </div>
+  <div class="col-sm-4">
+    {% if latest_im_tasks %}
+    <ul class="list-group">
+      <li class="list-group-item active">
+      <h4 class="list-group-item-heading">Important Tasks</h4>
+      </li>
+      {% for task in latest_im_tasks %}
+      <li class="list-group-item"><a href="{% url 'kurama:detail' task.task_id %}">{{ task.task_list}} - {{ task.title }}</a></li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p>No tasks are available.</p>
+    {% endif %}
+  </div>
+  <div class="col-sm-4">
+    {% if latest_ni_tasks %}
+    <li class="list-group-item active">
+    <h4 class="list-group-item-heading">Not Important Tasks</h4>
+    </li>
+    <ul class="list-group">
+      {% for task in latest_ni_tasks %}
+      <li class="list-group-item"><a href="{% url 'kurama:detail' task.task_id %}">{{ task.task_list}} - {{ task.title }}</a></li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p>No tasks are available.</p>
+    {% endif %}
+  </div>
+  <div class="col-sm-4">
+    {% if tasklists %}
+    <ul class="list-group">
+      <li class="list-group-item active">
+      <h4 class="list-group-item-heading">Tasks lists</h4>
+      </li>
+      {% for tl in tasklists %}
+      <li class="list-group-item">
+      <h5 class="list-group-item-heading">
+        <a href="{% url 'kurama:task_list' tl.title %}">{{ tl.title }}</a>
+        <p class="list-group-item-text"> {{ tl.info }}</p>
+      </h5>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p>No task lists are available </p>
+    {% endif %}
+  </div>
 </div>
 <div class="row">
-    <div class="col-sm-4">
-        <ul class="list-group">
-            <li class="list-group-item active">
-            <h4 class="list-group-item-heading">Statistcs by</h4>
-            <li class="list-group-item"><a href="{% url 'kurama:stats' %}">Global stats</a></li>
-            <li class="list-group-item"><a href="{% url 'kurama:current_week' %}">Current week</a></li>
-        </ul>
-    </div>
-    <div class="col-sm-4">
-        {% if projects %}
-            <ul class="list-group">
-                <li class="list-group-item active">
-                <h4 class="list-group-item-heading">Popular projects/task group</h4>
-                </li>
-            {% for proj in projects %}
-                <li class="list-group-item">
-                <a href="{% url 'kurama:tagname' proj %}">{{ proj }}</a>
-                </li>
-            {% endfor %}
-            </ul>
-        {% else %}
-            <p>No projects are available </p>
-        {% endif %}
-    </div>
+  <div class="col-sm-4">
+    <ul class="list-group">
+      <li class="list-group-item active">
+      <h4 class="list-group-item-heading">Statistcs by</h4>
+      <li class="list-group-item"><a href="{% url 'kurama:stats' %}">Global stats</a></li>
+      <li class="list-group-item"><a href="{% url 'kurama:current_week' %}">Current week</a></li>
+    </ul>
+  </div>
+  <div class="col-sm-4">
+    {% if projects %}
+    <ul class="list-group">
+      <li class="list-group-item active">
+      <h4 class="list-group-item-heading">Popular projects/task group</h4>
+      </li>
+      {% for proj in projects %}
+      <li class="list-group-item">
+      <a href="{% url 'kurama:tagname' proj %}">{{ proj }}</a>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p>No projects are available </p>
+    {% endif %}
+  </div>
 </div>
 
 {% endblock content %}

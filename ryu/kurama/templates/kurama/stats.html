@@ -9,18 +9,19 @@
 </div>
 
 <div class="col-md-8">
-{% if tasks %}
+  {% if tasks %}
   <ul class="list-group">
-  {% for task in tasks %}
+    {% for task in tasks %}
     <li class="list-group-item"> 
     <a href="{% url 'kurama:task_list' task.task_list.title %}"> {{ task.task_list.title }}</a> -
     <a href="{% url 'kurama:tag' task.tag %}"> {{ task.tag }}</a> -
     <a href="{% url 'kurama:detail' task.task_id %}"> {{ task.title }}</a>
     </li>
-  {% endfor %}
+    {% endfor %}
   </ul>
-{% else %}
+  {% else %}
   <p>No tasks are available.</p>
-{% endif %}
+  {% endif %}
+</div>
 
 {% endblock content %}

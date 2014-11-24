@@ -1,19 +1,20 @@
+{# vim:set et sw=2 ts=2 sts=2 tw=120: #}
 {% extends "base.html" %}
 
 {% block content %}
 
 <div class="page-header">
-    <br>
-    <h1>Complete list of tasks from {{ task_list }}</h1>
+  <br>
+  <h1>Complete list of tasks from {{ task_list }}</h1>
 </div>
 
 {% if tasks %}
-    <ul class="list-group">
-    {% for task in tasks %}
-        <li class="list-group-item> {{ task.title }}</li>
-    {% endfor %}
-    </ul>
+<ul class="list-group">
+  {% for task in tasks %}
+  <li class="list-group-item> {{ task.title }}</li>
+  {% endfor %}
+</ul>
 {% else %}
-    <p>No tasks are available.</p>
+<p>No tasks are available.</p>
 {% endif %}
 {% endblock content %}
