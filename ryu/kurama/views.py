@@ -73,7 +73,7 @@ def tagname(request, tagname):
                'tasks': tasks}
     return render(request, 'kurama/tag.html', context)
 
-def stats(request, time_range="thisweek", tl="all"):
+def stats(request, time_range="thisweek", tl="all", tag="all"):
     start_date = None
     end_date = None
     tasks = None
@@ -111,29 +111,22 @@ def stats(request, time_range="thisweek", tl="all"):
         start_date = last_saturday
         end_date = today
 
-    if tl == "im":
-        tasks = Task.objects.filter(completed__range=[start_date, end_date],
-                                    task_list__title__contains="Im")
-        task_lists = "Important"
-    elif tl == "nim":
-        tasks = Task.objects.filter(completed__range=[start_date, end_date],
-                                    task_list__title__contains="Ni")
-        task_lists = "Not important"
+    if tl == "all" and tag == "all":
+        tasks = Task.objects.filter(completed__range=[start_date, end_date])
     elif tl == "all":
-        tasks = Task.objects.filter(completed__range=[start_date, end_date])
-        task_lists = "All"
-    else:
-        tasks = Task.objects.filter(completed__range=[start_date, end_date])
-        task_lists = "All"
-        # count = Task.objects.filter(tag_name=proj.name,
-        #                             task_list__title__contains="Im").count()
+        tasks = Task.objects.filter(completed__range=[start_date, end_date],
+                                    tag__icontains=tag)
+    elif tag == "all":
+        tasks = Task.objects.filter(completed__range=[start_date, end_date],
+                                    task_list__title__icontains=tl)
 
-    query_info = {'start_date': start_date, 
-                  'end_date': end_date, 
-                  'task_lists': task_lists,
+    query_info = {'start_date': start_date,
+                  'end_date': end_date,
+                  'task_lists': tl,
                   'tag': tag}
-    return render(request, 'kurama/stats.html', {'tasks': tasks,
-                                                 'query_info': query_info})
+    context = {'query_info': query_info, 'tasks': tasks }
+
+    return render(request, 'kurama/stats.html', context)
 
 def about(request):
     return render(request, 'kurama/about.html')
