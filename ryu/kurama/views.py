@@ -2,6 +2,7 @@ from datetime import date, timedelta
 from calendar import monthrange
 from itertools import chain
 from operator import attrgetter, itemgetter
+from utils import get_date_range
 from django.http import Http404
 from django.shortcuts import render, get_object_or_404, get_list_or_404, render_to_response
 from django.core.management import call_command
@@ -73,56 +74,39 @@ def tagname(request, tagname):
                'tasks': tasks}
     return render(request, 'kurama/tag.html', context)
 
-def stats(request, time_range="thisweek", tl="all", tag="all"):
-    start_date = None
-    end_date = None
-    tasks = None
-    today = date.today()
-    if time_range == "thisweek":
-        # offset/delta from current week day till saturday,
-        # "last saturday" can't be same as "today"
-        offset = (today.weekday() + 1) % 7 + 1
-        last_saturday = today - timedelta(days=offset)
-        start_date = last_saturday
-        end_date = today
-    elif time_range == "lastweek":
-        offset = (today.weekday() + 2) % 7 + 1
-        friday = today - timedelta(days=offset)
-        saturday = friday - timedelta(days=6)
-        start_date = saturday
-        end_date = friday
-    elif time_range == "thismonth":
-        start_date = date(today.year, today.month, 1)
-        num_of_days_in_month = monthrange(today.year, today.month)[1]
-        end_date = start_date + timedelta(days=num_of_days_in_month - 1)
-    elif time_range == "lastmonth":
-        start_date = date(today.year, today.month - 1, 1)
-        num_of_days_in_month = monthrange(today.year, today.month - 1)[1]
-        end_date = start_date + timedelta(days=num_of_days_in_month - 1)
-    elif time_range == "thisquarter":
-        start_date = date(today.year, today.month - 1, 1)
-        num_of_days_in_quarter = monthrange(today.year, today.month - 1)[1]
-        end_date = start_date + timedelta(days=num_of_days_in_month - 1)
+def stats(request, time_range=None):
 
+    if time_range is not None:
+        time_range = time_range
+    elif request.GET.get('time_range'):
+        time_range = request.GET.get('time_range', 'thisweek')
+
+    tl_title = request.GET.get('tl', 'all') 
+    tag = request.GET.get('tag', 'all')
+
+    if request.GET.get('start_date') and request.GET.get('end_date'):
+        start_date = request.GET.get('start_date')
+        end_date = request.GET.get('end_date')
     else:
-        # set this week
-        offset = (today.weekday() + 1) % 7 + 1
-        last_saturday = today - timedelta(days=offset)
-        start_date = last_saturday
-        end_date = today
+        start_date, end_date = get_date_range(time_range)
 
-    if tl == "all" and tag == "all":
+    if tl_title == "all" and tag == "all":
         tasks = Task.objects.filter(completed__range=[start_date, end_date])
-    elif tl == "all":
+    elif tl_title == "all":
         tasks = Task.objects.filter(completed__range=[start_date, end_date],
                                     tag__icontains=tag)
     elif tag == "all":
         tasks = Task.objects.filter(completed__range=[start_date, end_date],
-                                    task_list__title__icontains=tl)
+                                    task_list__title__icontains=tl_title)
+    else:
+        tasks = Task.objects.filter(completed__range=[start_date, end_date],
+                                    task_list__title__icontains=tl_title,
+                                    tag__icontains=tag)
+
 
     query_info = {'start_date': start_date,
                   'end_date': end_date,
-                  'task_lists': tl,
+                  'task_lists': tl_title,
                   'tag': tag}
     context = {'query_info': query_info, 'tasks': tasks }
 
