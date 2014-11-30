@@ -103,11 +103,12 @@ def stats(request, time_range=None):
                                     task_list__title__icontains=tl_title,
                                     tag__icontains=tag)
 
-
-    query_info = {'start_date': start_date,
+    query_info = {'time_range': time_range,
+                  'start_date': start_date,
                   'end_date': end_date,
                   'task_lists': tl_title,
                   'tag': tag}
+
     context = {'query_info': query_info, 'tasks': tasks }
 
     return render(request, 'kurama/stats.html', context)

@@ -5,13 +5,38 @@
 
 <div class="page-header">
   <br>
-  <h1>Stats from {{ query_info.start_date }} to {{ query_info.end_date }}</h1>
+  <h1> Statistical analysis page </h1>
 </div>
+
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">Query Info</h3>
+  </div>
+  <div class="panel-body">
+    List of tasks from {{ query_info.start_date }} to {{ query_info.end_date }}
+    {% if query_info.task_lists == "all" %}
+    from all task lists and
+    {% else %}
+    for task list with name {{ query_info.task_lists }} and
+    {% endif %}
+    {% if query_info.tag == "all" %}
+    for all projects
+    {% else %}
+    for projects with name {{ query_info.tag }}
+    {% endif %}
+  </div>
+</div>
+
+<ul class="nav nav-tabs">
+  <li role="presentation" class="active"><a href="#">List of tasks</a></li>
+  <li role="presentation"><a href="#">Graphs</a></li>
+  <li role="presentation"><a href="#">Analysis</a></li>
+</ul>
 
 <div class="col-md-8">
   {% if tasks %}
   <ul class="list-group">
-    {% for task in tasks %}
+    {% for task in tasks|dictsortreversed:"completed" %}
     <li class="list-group-item"> 
     <a href="{% url 'kurama:task_list' task.task_list.title %}"> {{ task.task_list.title }}</a> -
     <a href="{% url 'kurama:tag' task.tag %}"> {{ task.tag }}</a> -
