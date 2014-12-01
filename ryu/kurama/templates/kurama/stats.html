@@ -33,20 +33,21 @@
   <li role="presentation"><a href="#">Analysis</a></li>
 </ul>
 
-<div class="col-md-8">
+<div class="col-md-12">
+  <table class="table table-hover">
   {% if tasks %}
-  <ul class="list-group">
+    <tr><td>Task list</td><td>Project</td><td>Task title</td></tr>
     {% for task in tasks|dictsortreversed:"completed" %}
-    <li class="list-group-item"> 
-    <a href="{% url 'kurama:task_list' task.task_list.title %}"> {{ task.task_list.title }}</a> -
-    <a href="{% url 'kurama:tag' task.tag %}"> {{ task.tag }}</a> -
-    <a href="{% url 'kurama:detail' task.task_id %}"> {{ task.title }}</a>
-    </li>
+    <tr>
+      <td><a href="{% url 'kurama:task_list' task.task_list.title %}"> {{ task.task_list.title }}</a></td>
+      <td><a href="{% url 'kurama:tag' task.tag %}"> {{ task.tag }}</a></td>
+      <td><a href="{% url 'kurama:detail' task.task_id %}"> {{ task.title }}</a></td>
+    </tr>
     {% endfor %}
-  </ul>
   {% else %}
-  <p>No tasks are available.</p>
+    <tr><td>No tasks are available</td></tr>
   {% endif %}
+  </table>
 </div>
 
 {% endblock content %}
