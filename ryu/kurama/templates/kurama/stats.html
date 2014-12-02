@@ -27,27 +27,41 @@
   </div>
 </div>
 
-<ul class="nav nav-tabs">
-  <li role="presentation" class="active"><a href="#">List of tasks</a></li>
-  <li role="presentation"><a href="#">Graphs</a></li>
-  <li role="presentation"><a href="#">Analysis</a></li>
-</ul>
-
-<div class="col-md-12">
-  <table class="table table-hover">
-  {% if tasks %}
-    <tr><td>Task list</td><td>Project</td><td>Task title</td></tr>
-    {% for task in tasks|dictsortreversed:"completed" %}
-    <tr>
-      <td><a href="{% url 'kurama:task_list' task.task_list.title %}"> {{ task.task_list.title }}</a></td>
-      <td><a href="{% url 'kurama:tag' task.tag %}"> {{ task.tag }}</a></td>
-      <td><a href="{% url 'kurama:detail' task.task_id %}"> {{ task.title }}</a></td>
-    </tr>
-    {% endfor %}
-  {% else %}
-    <tr><td>No tasks are available</td></tr>
-  {% endif %}
-  </table>
-</div>
+<div id="content">
+  <ul class="nav nav-tabs">
+    <li role="presentation" class="active"><a href="#tasks" data-toggle="tab">List of tasks</a></li>
+    <li role="presentation"><a href="#graphs" data-toggle="tab">Graphs</a></li>
+    <li role="presentation"><a href="#analysis" data-toggle="tab">Analysis</a></li>
+  </ul>
+  <div class="tab-content">
+    <div class="tab-pane active" id="tasks">
+      <h3>Task list </h3>
+      <div class="col-md-12" >
+        <table class="table table-hover">
+        {% if tasks %}
+          <tr><td>Task list</td><td>Project</td><td>Task title</td></tr>
+          {% for task in tasks|dictsortreversed:"completed" %}
+          <tr>
+            <td><a href="{% url 'kurama:task_list' task.task_list.title %}"> {{ task.task_list.title }}</a></td>
+            <td><a href="{% url 'kurama:tag' task.tag %}"> {{ task.tag }}</a></td>
+            <td><a href="{% url 'kurama:detail' task.task_id %}"> {{ task.title }}</a></td>
+          </tr>
+          {% endfor %}
+        {% else %}
+          <tr><td>No tasks are available</td></tr>
+        {% endif %}
+        </table>
+      </div>
+    </div>
+    <div class="tab-pane" id="graphs">
+      <h3>Graphssss</h3>
+      <p>Graphs Graphs Graphs </p>
+    </div>
+    <div class="tab-pane" id="analysis">
+      <h3>Analysis </h3>
+      <p>Analysis Analysis Analysis </p>
+    </div>
+  </div>
+</div> 
 
 {% endblock content %}
