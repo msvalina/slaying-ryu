@@ -1,5 +1,11 @@
 {# vim:set et sw=2 ts=2 sts=2 tw=120: #}
 {% extends "base.html" %}
+{% load nvd3_tags %}
+
+{% block extrahead %}
+{% include_chart_jscss %}
+
+{% endblock extrahead %}
 
 {% block content %}
 
@@ -29,9 +35,9 @@
 
 <div id="content">
   <ul class="nav nav-tabs">
-    <li role="presentation" class="active"><a href="#tasks" data-toggle="tab">List of tasks</a></li>
-    <li role="presentation"><a href="#graphs" data-toggle="tab">Graphs</a></li>
-    <li role="presentation"><a href="#analysis" data-toggle="tab">Analysis</a></li>
+    <li role="presentation" class="active"><a class="tasks" href="#tasks" data-toggle="tab">List of tasks</a></li>
+    <li role="presentation"><a class="graphs" href="#graphs" data-toggle="tab">Graphs</a></li>
+    <li role="presentation"><a class="analysis" href="#analysis" data-toggle="tab">Analysis</a></li>
   </ul>
   <div class="tab-content">
     <div class="tab-pane active" id="tasks">
@@ -55,13 +61,19 @@
     </div>
     <div class="tab-pane" id="graphs">
       <h3>Graphssss</h3>
-      <p>Graphs Graphs Graphs </p>
+        <div class="col-md-12">
+          {% include_container chartcontainer 600 800 %}
+        </div>
     </div>
     <div class="tab-pane" id="analysis">
       <h3>Analysis </h3>
       <p>Analysis Analysis Analysis </p>
     </div>
+<script>
+  $(".graphs").click(function() {
+      {% load_chart charttype chartdata chartcontainer extra %}
+  });
+</script>
   </div>
 </div> 
-
 {% endblock content %}
