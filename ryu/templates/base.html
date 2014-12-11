@@ -14,14 +14,18 @@ Transitional//EN"
 <meta name="keywords" content="Time-Management, Python, Django" />
 <meta name="description" content="Kurama is app for statistcal analysis of completed tasks that will help with
 evaulations and retrospectives of completed work." />
-<script type="text/javascript" src="http://code.jquery.com/jquery-2.1.0.min.js"></script>
+
+<script type="text/javascript" src="/static/jquery/dist/jquery.min.js"></script>
+<script type="text/javascript" src="/static/moment/min/moment.min.js"></script>
+<script type="text/javascript" src="/static/bootstrap/dist/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="/static/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js"></script>
+<link rel="stylesheet" href="/static/bootstrap/dist/css/bootstrap.min.css" />
+<link rel="stylesheet" href="/static/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css" />
 
 {# Load the tag libraries #}
 {% load bootstrap3 %}
 
 {# Load CSS and JavaScript #}
-{% bootstrap_css %}
-{% bootstrap_javascript %}
 
 {# Display django.contrib.messages as Bootstrap alerts #}
 {% bootstrap_messages %}

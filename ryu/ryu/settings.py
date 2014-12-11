@@ -116,9 +116,12 @@ STATICFILES_FINDERS = (
 BOWER_COMPONENTS_ROOT = os.path.join(PROJECT_ROOT, 'components')
 BOWER_PATH = '/usr/local/bin/bower'
 BOWER_INSTALLED_APPS = (
+    'jquery',
+    'bootstrap',
     'd3#3.3.6',
     'nvd3#1.1.12-beta',
-    'jquery',
+    'moment',
+    'eonasdan-bootstrap-datetimepicker#latest',
 )
 
 
