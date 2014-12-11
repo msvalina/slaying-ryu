@@ -3,3 +3,4 @@ ryu/tags
 ryu/kurama/management/commands/keys.txt
 ryu/kurama/management/commands/tasks.dat
 *.pyc
+ryu/components

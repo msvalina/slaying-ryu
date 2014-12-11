@@ -18,6 +18,8 @@ Project is using:
 * bootstrap3 - for UI
 * djangobower - for easy install of bower apps jquery, d3.js etc.
 * django nvd3 - for beautifull charts
+* moment.js - for datetime library
+* eonasdan-bootstrap-datetimepicker 
 
 ### Why Ryu?
 **Ryu** is a Japanese dragon with three claws!!! And I'm gonna slay that
@@ -29,3 +31,8 @@ that will slay dragon Ryu :-)
 ### Current status
 At the moment a lot of things are hard coded and badly written, I am aware of
 that, but priority was to make any kind of working version.
+
+### Setup instructions
+Aside from virtualenv requirements.txt node.js and bower also need to be
+installed. Then django's bower_install management command can be used to
+installed required js libraries.
