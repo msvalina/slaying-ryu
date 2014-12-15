@@ -16,6 +16,52 @@
 
 <div class="panel panel-default">
   <div class="panel-heading">
+    <h3 class="panel-title">Filter</h3>
+  </div>
+  <div class="row">
+    <form action="/kurama/stats/" method="get" accept-charset="utf-8">
+      <div class="col-sm-4"> 
+        <div class="form-group">
+          <div class='input-group date' id='startdatetimepicker'>
+            <input type='text' class="form-control" data-date-format="YYYY-MM-DD" name="start_date" value="2014-12-01"/>
+            <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span>
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-4"> 
+        <div class="form-group">
+          <div class='input-group date' id='enddatetimepicker'>
+            <input type='text' class="form-control" data-date-format="YYYY-MM-DD" name="end_date" value="" />
+            <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span>
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-4">
+        <button type="submit" class="btn btn-default">Submit</button>
+      </div>
+    </form>
+    <script type="text/javascript">
+      $(function () {
+          $('#startdatetimepicker').datetimepicker({
+            pickTime:false
+          });
+          $('#enddatetimepicker').datetimepicker({
+            pickTime:false
+          });
+          $("#startdatetimepicker").on("dp.change",function (e) {
+             $('#enddatetimepicker').data("DateTimePicker").setMinDate(e.date);
+          });
+          $("#enddatetimepicker").on("dp.change",function (e) {
+             $('#startdatetimepicker').data("DateTimePicker").setMaxDate(e.date);
+          });
+      });
+    </script>
+  </div>
+</div>
+<div class="panel panel-default">
+  <div class="panel-heading">
     <h3 class="panel-title">Query Info</h3>
   </div>
   <div class="panel-body">
@@ -35,9 +81,9 @@
 
 <div id="content">
   <ul class="nav nav-tabs">
-    <li role="presentation" class="active"><a class="tasks" href="#tasks" data-toggle="tab">List of tasks</a></li>
-    <li role="presentation"><a class="graphs" href="#graphs" data-toggle="tab">Graphs</a></li>
-    <li role="presentation"><a class="analysis" href="#analysis" data-toggle="tab">Analysis</a></li>
+    <li role="presentation" class="active"><a class="tasks" href="#tasks" data-toggle="tab"><i class="glyphicon glyphicon-th-list"></i> Tasks</a></li>
+    <li role="presentation"><a class="graphs" href="#graphs" data-toggle="tab"><i class="glyphicon glyphicon-stats"></i> Graphs</a></li>
+    <li role="presentation"><a class="analysis" href="#analysis" data-toggle="tab"><i class="glyphicon glyphicon-retweet"></i> Analysis</a></li>
   </ul>
   <div class="tab-content">
     <div class="tab-pane active" id="tasks">
