@@ -18,47 +18,89 @@
   <div class="panel-heading">
     <h3 class="panel-title">Filter</h3>
   </div>
-  <div class="row">
-    <form action="/kurama/stats/" method="get" accept-charset="utf-8">
-      <div class="col-sm-4"> 
-        <div class="form-group">
-          <div class='input-group date' id='startdatetimepicker'>
-            <input type='text' class="form-control" data-date-format="YYYY-MM-DD" name="start_date" value="2014-12-01"/>
-            <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span>
-            </span>
+  <form action="/kurama/stats/" method="get" accept-charset="utf-8">
+  <div class="panel-body">
+    <div class="row">
+      <div class='col-sm-4'>
+          <div class="form-group">
+            <label for="tasklist">Task list</label>
+            <select class="form-control" id="tasklist" name="tl">
+              <option>Im</option>
+              <option>Ni</option>
+              <option>Im&amp;Ds</option>
+              <option>Im&amp;Nds</option>
+              <option>Ni&amp;Ds</option>
+              <option>Ni&amp;Nds</option>
+            </select>
+          </div>
+      </div> <div class='col-sm-4'>
+          <div class="form-group">
+            <label for="tag">Tag/Project</label>
+            <div class='input-group' id='tag'>
+              <input type='text' class="form-control" name="tag" />
+              <span class="input-group-addon"><span class="glyphicon glyphicon-list"></span>
+              </span>
+            </div>
+          </div>
+      </div>
+      <div class='col-sm-4'>
+          <div class="form-group">
+            <label for="time-range">Time range</label>
+            <select class="form-control" name="time_range">
+              <option>thisweek</option>
+              <option>thismonth</option>
+              <option>lastweek</option>
+              <option>lastmonth</option>
+              <option>thisquarter</option>
+            </select>
+          </div>
+      </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-4">
+          <div class="form-group">
+            <label for="startdatetimepicker">Start date</label>
+            <div class='input-group date' id='startdatetimepicker'>
+              <input type='text' class="form-control" data-date-format="YYYY-MM-DD" name="start_date" />
+              <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span>
+              </span>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="col-sm-4"> 
-        <div class="form-group">
-          <div class='input-group date' id='enddatetimepicker'>
-            <input type='text' class="form-control" data-date-format="YYYY-MM-DD" name="end_date" value="" />
-            <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span>
-            </span>
+        <div class="col-sm-4">
+          <div class="form-group">
+            <label for="enddatetimepicker">End date</label>
+            <div class='input-group date' id='enddatetimepicker'>
+              <input type='text' class="form-control" data-date-format="YYYY-MM-DD" name="end_date" value="" />
+              <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span>
+              </span>
+            </div>
           </div>
         </div>
+    </div>
+      <div class="row">
+        <div class="col-sm-4">
+          <button type="submit" class="btn btn-default">Submit</button>
+        </div>
       </div>
-      <div class="col-sm-4">
-        <button type="submit" class="btn btn-default">Submit</button>
-      </div>
-    </form>
-    <script type="text/javascript">
-      $(function () {
-          $('#startdatetimepicker').datetimepicker({
-            pickTime:false
-          });
-          $('#enddatetimepicker').datetimepicker({
-            pickTime:false
-          });
-          $("#startdatetimepicker").on("dp.change",function (e) {
-             $('#enddatetimepicker').data("DateTimePicker").setMinDate(e.date);
-          });
-          $("#enddatetimepicker").on("dp.change",function (e) {
-             $('#startdatetimepicker').data("DateTimePicker").setMaxDate(e.date);
-          });
-      });
-    </script>
+      <script type="text/javascript">
+        $(function () {
+            $('#startdatetimepicker').datetimepicker({
+              pickTime:false
+            });
+            $('#enddatetimepicker').datetimepicker({
+              pickTime:false
+            });
+            $("#startdatetimepicker").on("dp.change",function (e) {
+               $('#enddatetimepicker').data("DateTimePicker").setMinDate(e.date);
+            });
+            $("#enddatetimepicker").on("dp.change",function (e) {
+               $('#startdatetimepicker').data("DateTimePicker").setMaxDate(e.date);
+            });
+        });
+      </script>
   </div>
+  </form>
 </div>
 <div class="panel panel-default">
   <div class="panel-heading">
