@@ -1,9 +1,7 @@
 from datetime import date, timedelta
-from calendar import monthrange
 from itertools import chain
 from operator import attrgetter, itemgetter
-from collections import OrderedDict
-from utils import get_date_range
+from utils import get_date_range, calc_pie_chart_data
 from django.http import Http404
 from django.shortcuts import render, get_object_or_404, get_list_or_404, render_to_response
 from django.core.management import call_command
@@ -110,46 +108,12 @@ def stats(request, time_range=None):
                   'task_lists': tl_title,
                   'tag': tag}
 
-    unfiltered_xdata = []
-    ydata = []
-    for task in tasks:
-        unfiltered_xdata += [task.tag]
-    # filter out duplicates
-    xdata = list(OrderedDict.fromkeys(unfiltered_xdata))
+    pie_chart_data = calc_pie_chart_data(tasks) 
 
-    # counte number of repeated tags and save it to ydata
-    counter = 0
-    for i in range(0, len(xdata)):
-        for j in range(0, len(unfiltered_xdata)):
-            if xdata[i] == unfiltered_xdata[j]:
-                counter += 1
-        ydata.append(counter)
-        counter = 0
+    data = {'tasks': tasks,
+            'query_info': query_info,
+            'pie_chart_data': pie_chart_data}
 
-    color_list = ['#5d8aa8', '#e32636', '#efdecd', '#ffbf00', '#ff033e',
-                  '#a4c639', '#b2beb5', '#8db600', '#7fffd4', '#ff007f',
-                  '#ff55a3', '#5f9ea0']
-    extra_serie = {
-        "tooltip": {"y_start": "", "y_end": " tasks"},
-        "color_list": color_list
-    }
-    chartdata = {'x': xdata, 'y1': ydata, 'extra1': extra_serie}
-    charttype = "pieChart"
-    chartcontainer = 'piechart_container'  # container name
-
-    data = {
-        'charttype': charttype,
-        'chartdata': chartdata,
-        'chartcontainer': chartcontainer,
-        'extra': {
-            'x_is_date': False,
-            'x_axis_format': '',
-            'tag_script_js': False,
-            'jquery_on_ready': False,
-        },
-        'query_info': query_info,
-        'tasks': tasks,
-    }
 
     return render(request, 'kurama/stats.html', data)
 
