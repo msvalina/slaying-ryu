@@ -25,6 +25,7 @@
           <div class="form-group">
             <label for="tasklist">Task list</label>
             <select class="form-control" id="tasklist" name="tl">
+              <option>all</option>
               <option>Im</option>
               <option>Ni</option>
               <option>Im&amp;Ds</option>
@@ -37,7 +38,7 @@
           <div class="form-group">
             <label for="tag">Tag/Project</label>
             <div class='input-group' id='tag'>
-              <input type='text' class="form-control" name="tag" />
+              <input type='text' class="form-control" name="tag" value="all" />
               <span class="input-group-addon"><span class="glyphicon glyphicon-list"></span>
               </span>
             </div>
@@ -150,7 +151,7 @@
     <div class="tab-pane" id="graphs">
       <h3>Graphssss</h3>
         <div class="col-md-12">
-          {% include_container chartcontainer 600 800 %}
+          {% include_container pie_chart_data.chartcontainer 600 800 %}
         </div>
     </div>
     <div class="tab-pane" id="analysis">
@@ -159,7 +160,7 @@
     </div>
 <script>
   $(".graphs").click(function() {
-      {% load_chart charttype chartdata chartcontainer extra %}
+      {% load_chart pie_chart_data.charttype pie_chart_data.chartdata pie_chart_data.chartcontainer pie_chart_data.extra %}
   });
 </script>
   </div>
